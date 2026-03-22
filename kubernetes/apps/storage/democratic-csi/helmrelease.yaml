@@ -95,4 +95,4 @@ spec:
 
     driver:
       config:
-        driver: zfs-generic-nfs
+        driver: freenas-api-nfs
