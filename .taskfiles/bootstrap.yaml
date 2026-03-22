@@ -2,9 +2,9 @@
 version: "3"
 
 vars:
-  # Dynamically resolve primary IP
+  # Dynamically resolve primary IP (fallback for systems without hostname -I)
   NODE_IP:
-    sh: hostname -I | awk '{print $1}'
+    sh: hostname -I 2>/dev/null | awk '{print $1}' || ip -4 addr show ens18 2>/dev/null | grep -oP '(?<=inet\s)\d+\.\d+\.\d+\.\d+' | head -1 || echo "192.168.168.10"
 
 tasks:
   k3s:
@@ -36,15 +36,10 @@ tasks:
   cilium:
     desc: Install Cilium CNI with eBPF and kube-proxy replacement
     vars:
-      CILIUM_VERSION: "1.16.5"
+      CILIUM_VERSION: "1.19.1"
     cmds:
       - |
-        helm repo add cilium https://helm.cilium.io/ || true
-        helm repo update cilium
-      - |
-        helm upgrade --install cilium cilium/cilium \
-          --version {{.CILIUM_VERSION}} \
-          --namespace kube-system \
+        cilium install --version {{.CILIUM_VERSION}} \
           --set operator.replicas=1 \
           --set ipam.mode=kubernetes \
           --set kubeProxyReplacement=true \
@@ -55,7 +50,7 @@ tasks:
           --set hubble.ui.enabled=true \
           --set socketLB.hostNamespaceOnly=true \
           --set bpf.masquerade=true \
-          --set egressMasqueradeInterfaces=ens18 \
+          --set 'devices={ens18}' \
           --set routingMode=native \
           --set autoDirectNodeRoutes=true \
           --set ipv4NativeRoutingCIDR=10.42.0.0/16 \
@@ -87,6 +82,15 @@ tasks:
         echo "Replace <YOUR_1PASSWORD_SERVICE_ACCOUNT_TOKEN> with your actual token."
     silent: true
 
+  external-secrets-crds:
+    desc: Install external-secrets CRDs (required before helm release due to size limits)
+    vars:
+      ESO_VERSION: "v2.2.0"
+    cmds:
+      - |
+        kubectl apply -f "https://raw.githubusercontent.com/external-secrets/external-secrets/{{.ESO_VERSION}}/deploy/crds/bundle.yaml" \
+          --server-side --force-conflicts
+
   flux:
     desc: Bootstrap Flux CD
     vars:
@@ -103,13 +107,26 @@ tasks:
     deps:
       - namespaces
 
+  flux-networkpolicy-fix:
+    desc: Fix Flux NetworkPolicy to allow kubelet health checks
+    cmds:
+      - |
+        kubectl patch networkpolicy allow-egress -n flux-system \
+          --type='json' \
+          -p='[{"op": "replace", "path": "/spec/ingress", "value": [{}]}]'
+    silent: true
+
   all:
     desc: Run all bootstrap tasks in correct order
     cmds:
       - task: k3s
       - task: cilium
       - task: namespaces
+      - task: external-secrets-crds
+      - echo ""
       - echo "Next steps:"
-      - echo "1. Run 'task bootstrap:onepassword' and follow instructions"
+      - echo "1. Run 'task bootstrap:onepassword' and follow instructions to create 1Password secret"
       - echo "2. Set GITHUB_USER and GITHUB_REPO environment variables"
       - echo "3. Run 'task bootstrap:flux' to bootstrap Flux"
+      - echo "4. Run 'task bootstrap:flux-networkpolicy-fix' to allow kubelet health checks"
+      - echo "5. Wait for Flux to reconcile all kustomizations"
