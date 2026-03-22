@@ -1,0 +1,43 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: vpa
+  namespace: vpa
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: vpa
+      version: "4.7.1"
+      sourceRef:
+        kind: HelmRepository
+        name: fairwinds-stable
+        namespace: flux-system
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    # Recommender - generates recommendations
+    recommender:
+      enabled: true
+      resources:
+        requests:
+          cpu: 25m
+          memory: 128Mi
+        limits:
+          memory: 256Mi
+
+    # Updater - DISABLED (we never want auto mode on single node)
+    updater:
+      enabled: false
+
+    # Admission Controller - DISABLED (Off mode only)
+    admissionController:
+      enabled: false

@@ -1,0 +1,94 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+tasks:
+  nodes:
+    desc: Get cluster nodes
+    cmds:
+      - kubectl get nodes -o wide
+
+  pods:
+    desc: Get all pods across namespaces
+    cmds:
+      - kubectl get pods -A -o wide
+
+  pods:failed:
+    desc: Get failed/pending pods
+    cmds:
+      - kubectl get pods -A --field-selector=status.phase!=Running,status.phase!=Succeeded
+
+  events:
+    desc: Get cluster events sorted by timestamp
+    cmds:
+      - kubectl get events -A --sort-by='.lastTimestamp' | tail -50
+
+  events:warnings:
+    desc: Get warning events only
+    cmds:
+      - kubectl get events -A --field-selector type=Warning --sort-by='.lastTimestamp'
+
+  resources:
+    desc: Show resource usage
+    cmds:
+      - kubectl top nodes || echo "Metrics server not installed"
+      - kubectl top pods -A || echo "Metrics server not installed"
+
+  openclaw:status:
+    desc: Get all OpenClaw instances
+    cmds:
+      - kubectl get openclawinstances -A -o wide 2>/dev/null || echo "OpenClaw CRD not installed"
+      - kubectl get pods -n openclaw-trading -l app.kubernetes.io/name=openclaw 2>/dev/null || true
+      - kubectl get pods -n openclaw-personal -l app.kubernetes.io/name=openclaw 2>/dev/null || true
+      - kubectl get pods -n openclaw-signals -l app.kubernetes.io/name=openclaw 2>/dev/null || true
+
+  openclaw:logs:
+    desc: Stream OpenClaw logs (var INSTANCE=trading|personal|signals)
+    cmds:
+      - kubectl logs -n openclaw-{{.INSTANCE}} -l app.kubernetes.io/name=openclaw -f --tail=100
+    requires:
+      vars:
+        - INSTANCE
+
+  media:status:
+    desc: Get pods in media namespace
+    cmds:
+      - kubectl get pods -n media -o wide
+      - kubectl get pvc -n media
+
+  secrets:verify:
+    desc: Verify all ExternalSecrets across namespaces
+    cmds:
+      - kubectl get externalsecrets -A
+      - echo "---"
+      - 'kubectl get externalsecrets -A -o jsonpath=''{range .items[*]}{.metadata.namespace}/{.metadata.name}: {.status.conditions[0].reason}{"\n"}{end}'''
+
+  pvc:
+    desc: List all PVCs
+    cmds:
+      - kubectl get pvc -A
+
+  services:
+    desc: List all services
+    cmds:
+      - kubectl get svc -A
+
+  ingress:
+    desc: List all IngressRoutes
+    cmds:
+      - kubectl get ingressroutes -A 2>/dev/null || echo "Traefik CRDs not installed"
+
+  certificates:
+    desc: List all certificates
+    cmds:
+      - kubectl get certificates -A 2>/dev/null || echo "cert-manager CRDs not installed"
+      - kubectl get certificaterequests -A 2>/dev/null || true
+
+  debug:dns:
+    desc: Debug DNS resolution
+    cmds:
+      - kubectl run -it --rm debug-dns --image=busybox --restart=Never -- nslookup kubernetes.default.svc.cluster.local
+
+  debug:network:
+    desc: Debug network connectivity
+    cmds:
+      - kubectl run -it --rm debug-net --image=nicolaka/netshoot --restart=Never -- /bin/bash

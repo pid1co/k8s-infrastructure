@@ -1,0 +1,64 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+tasks:
+  reconcile:
+    desc: Force reconcile flux-system
+    cmds:
+      - flux reconcile source git flux-system
+      - flux reconcile kustomization flux-system
+
+  status:
+    desc: Show all Kustomization status
+    cmds:
+      - flux get kustomizations -A
+
+  logs:
+    desc: Stream source-controller logs
+    cmds:
+      - kubectl logs -n flux-system -l app=source-controller -f
+
+  suspend:
+    desc: Suspend a Kustomization (var NAME required)
+    cmds:
+      - flux suspend kustomization {{.NAME}}
+    requires:
+      vars:
+        - NAME
+
+  resume:
+    desc: Resume a Kustomization (var NAME required)
+    cmds:
+      - flux resume kustomization {{.NAME}}
+    requires:
+      vars:
+        - NAME
+
+  hr:
+    desc: List all HelmReleases
+    cmds:
+      - flux get helmreleases -A
+
+  hr:reconcile:
+    desc: Reconcile a HelmRelease (var NAME and NS required)
+    cmds:
+      - flux reconcile helmrelease {{.NAME}} -n {{.NS}}
+    requires:
+      vars:
+        - NAME
+        - NS
+
+  sources:
+    desc: List all Flux sources
+    cmds:
+      - flux get sources all -A
+
+  events:
+    desc: Show Flux events
+    cmds:
+      - kubectl get events -n flux-system --sort-by='.lastTimestamp'
+
+  health:
+    desc: Check Flux health
+    cmds:
+      - flux check

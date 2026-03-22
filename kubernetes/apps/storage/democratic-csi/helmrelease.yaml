@@ -1,0 +1,98 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: democratic-csi-nfs
+  namespace: democratic-csi
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: democratic-csi
+      version: "0.14.7"
+      sourceRef:
+        kind: HelmRepository
+        name: democratic-csi
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  valuesFrom:
+    - kind: Secret
+      name: truenas-csi-config
+      valuesKey: driver-config
+      targetPath: driver.config
+  values:
+    csiDriver:
+      name: "org.democratic-csi.nfs"
+
+    storageClasses:
+      - name: truenas-nfs
+        defaultClass: false
+        reclaimPolicy: Retain
+        volumeBindingMode: Immediate
+        allowVolumeExpansion: true
+        parameters:
+          fsType: nfs
+        mountOptions:
+          - nfsvers=4.1
+          - nconnect=8
+          - noatime
+          - nodiratime
+          - rsize=131072
+          - wsize=131072
+        secrets:
+          provisioner-secret:
+          controller-publish-secret:
+          node-stage-secret:
+          node-publish-secret:
+          controller-expand-secret:
+
+    volumeSnapshotClasses:
+      - name: truenas-nfs-snapclass
+        deletionPolicy: Retain
+        parameters:
+
+    controller:
+      enabled: true
+      strategy: node
+      externalProvisioner:
+        extraArgs:
+          - --leader-election=false
+          - --node-deployment=true
+          - --node-deployment-immediate-binding=false
+          - --feature-gates=Topology=true
+          - --strict-topology=true
+          - --enable-capacity=true
+          - --capacity-ownerref-level=1
+      externalResizer:
+        extraArgs:
+          - --leader-election=false
+          - --node-deployment=true
+      externalSnapshotter:
+        extraArgs:
+          - --leader-election=false
+          - --node-deployment=true
+      resources:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          memory: 128Mi
+
+    node:
+      enabled: true
+      resources:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          memory: 128Mi
+
+    driver:
+      config:
+        driver: zfs-generic-nfs

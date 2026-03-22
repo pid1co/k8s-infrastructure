@@ -1,0 +1,78 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nvidia-gpu-operator
+  namespace: gpu-operator
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: gpu-operator
+      version: "v24.9.1"
+      sourceRef:
+        kind: HelmRepository
+        name: nvidia
+        namespace: flux-system
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    # Operator settings
+    operator:
+      defaultRuntime: containerd
+
+    # Driver - use pre-installed driver on host
+    driver:
+      enabled: false  # Driver already installed on k3s host
+
+    # Container toolkit
+    toolkit:
+      enabled: true
+
+    # Device plugin
+    devicePlugin:
+      enabled: true
+
+    # DCGM exporter for metrics
+    dcgmExporter:
+      enabled: false  # Enable if you want GPU metrics
+
+    # MIG manager (not needed for single GPU)
+    migManager:
+      enabled: false
+
+    # Node feature discovery
+    nfd:
+      enabled: true
+
+    # GFD (GPU Feature Discovery)
+    gfd:
+      enabled: true
+
+    # MPS (Multi-Process Service)
+    mps:
+      enabled: false
+
+    # Sandbox workloads
+    sandboxWorkloads:
+      enabled: false
+
+    # vGPU
+    vgpuManager:
+      enabled: false
+
+    # vGPU device manager
+    vgpuDeviceManager:
+      enabled: false
+
+    # CDI (Container Device Interface)
+    cdi:
+      enabled: true
+      default: true

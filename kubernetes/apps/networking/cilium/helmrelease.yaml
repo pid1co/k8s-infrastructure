@@ -1,0 +1,66 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cilium
+  namespace: kube-system
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: cilium
+      version: "1.16.5"
+      sourceRef:
+        kind: HelmRepository
+        name: cilium
+        namespace: flux-system
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    operator:
+      replicas: 1
+
+    # IPAM
+    ipam:
+      mode: kubernetes
+
+    # kube-proxy replacement
+    kubeProxyReplacement: true
+    k8sServiceHost: 192.168.168.10
+    k8sServicePort: 6443
+
+    # Hubble observability
+    hubble:
+      enabled: true
+      relay:
+        enabled: true
+      ui:
+        enabled: true
+
+    # SocketLB for Tailscale compatibility
+    socketLB:
+      hostNamespaceOnly: true
+
+    # BPF masquerading
+    bpf:
+      masquerade: true
+
+    # Egress interface for masquerading
+    egressMasqueradeInterfaces: ens18
+
+    # Native routing
+    routingMode: native
+    autoDirectNodeRoutes: true
+    ipv4NativeRoutingCIDR: 10.42.0.0/16
+
+    # Performance optimizations
+    installNoConntrackIptablesRules: true
+    endpointRoutes:
+      enabled: true

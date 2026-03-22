@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+tasks:
+  recommendations:
+    desc: Print VPA recommendations for all namespaces as HelmRelease resource blocks
+    cmds:
+      - |
+        echo "# VPA Recommendations - Generated $(date)"
+        echo "# Use these values to update HelmRelease resource requests"
+        echo ""
+
+        for vpa in $(kubectl get vpa -A -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{"\n"}{end}'); do
+          NS=$(echo $vpa | cut -d'/' -f1)
+          NAME=$(echo $vpa | cut -d'/' -f2)
+
+          echo "---"
+          echo "# VPA: $NAME (namespace: $NS)"
+
+          # Get recommendations
+          RECS=$(kubectl get vpa -n $NS $NAME -o jsonpath='{.status.recommendation.containerRecommendations}' 2>/dev/null)
+
+          if [ -n "$RECS" ] && [ "$RECS" != "null" ]; then
+            kubectl get vpa -n $NS $NAME -o jsonpath='{range .status.recommendation.containerRecommendations[*]}# Container: {.containerName}
+        resources:
+          requests:
+            cpu: {.target.cpu}
+            memory: {.target.memory}
+          limits:
+            memory: {.upperBound.memory}
+        {"\n"}{end}'
+          else
+            echo "# No recommendations available yet (needs more data)"
+          fi
+          echo ""
+        done
+
+  status:
+    desc: Show VPA status for all workloads
+    cmds:
+      - kubectl get vpa -A -o custom-columns='NAMESPACE:.metadata.namespace,NAME:.metadata.name,MODE:.spec.updatePolicy.updateMode,TARGET-CPU:.status.recommendation.containerRecommendations[0].target.cpu,TARGET-MEM:.status.recommendation.containerRecommendations[0].target.memory'
+
+  list:
+    desc: List all VPA objects
+    cmds:
+      - kubectl get vpa -A
+
+  describe:
+    desc: Describe a VPA (vars NAME, NAMESPACE)
+    cmds:
+      - kubectl describe vpa {{.NAME}} -n {{.NAMESPACE}}
+    requires:
+      vars:
+        - NAME
+        - NAMESPACE
+
+  logs:
+    desc: View VPA recommender logs
+    cmds:
+      - kubectl logs -n vpa -l app=vpa-recommender --tail=100 -f

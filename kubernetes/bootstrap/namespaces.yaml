@@ -1,0 +1,182 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flux-system
+  labels:
+    app.kubernetes.io/part-of: flux
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: networking
+  labels:
+    app.kubernetes.io/component: networking
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: traefik
+  labels:
+    app.kubernetes.io/component: ingress
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cert-manager
+  labels:
+    app.kubernetes.io/component: certificates
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: external-secrets
+  labels:
+    app.kubernetes.io/component: secrets
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: democratic-csi
+  labels:
+    app.kubernetes.io/component: storage
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gpu-operator
+  labels:
+    app.kubernetes.io/component: gpu
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vpa
+  labels:
+    app.kubernetes.io/component: observability
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tailscale
+  labels:
+    app.kubernetes.io/component: networking
+---
+# Application namespaces
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: media
+  labels:
+    app.kubernetes.io/component: applications
+    app.kubernetes.io/category: media
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: authentik
+  labels:
+    app.kubernetes.io/component: applications
+    app.kubernetes.io/category: auth
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: paperless
+  labels:
+    app.kubernetes.io/component: applications
+    app.kubernetes.io/category: productivity
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: homepage
+  labels:
+    app.kubernetes.io/component: applications
+    app.kubernetes.io/category: dashboard
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: immich
+  labels:
+    app.kubernetes.io/component: applications
+    app.kubernetes.io/category: photos
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: linkwarden
+  labels:
+    app.kubernetes.io/component: applications
+    app.kubernetes.io/category: productivity
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mealie
+  labels:
+    app.kubernetes.io/component: applications
+    app.kubernetes.io/category: productivity
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: romm
+  labels:
+    app.kubernetes.io/component: applications
+    app.kubernetes.io/category: gaming
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: snippet-box
+  labels:
+    app.kubernetes.io/component: applications
+    app.kubernetes.io/category: productivity
+---
+# OpenClaw namespaces
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openclaw-system
+  labels:
+    app.kubernetes.io/component: openclaw
+    app.kubernetes.io/part-of: openclaw
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openclaw-trading
+  labels:
+    app.kubernetes.io/component: openclaw
+    app.kubernetes.io/part-of: openclaw
+    openclaw.io/instance: trading
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openclaw-personal
+  labels:
+    app.kubernetes.io/component: openclaw
+    app.kubernetes.io/part-of: openclaw
+    openclaw.io/instance: personal
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openclaw-signals
+  labels:
+    app.kubernetes.io/component: openclaw
+    app.kubernetes.io/part-of: openclaw
+    openclaw.io/instance: signals
+---
+# MCP server namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mcp-servers
+  labels:
+    app.kubernetes.io/component: mcp

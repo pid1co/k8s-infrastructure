@@ -1,0 +1,124 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+tasks:
+  migrate:
+    desc: Migrate app config from Docker hostPath to democratic-csi PVC
+    vars:
+      RSYNC_IMAGE: "instrumentisto/rsync-ssh:alpine"
+    cmds:
+      - |
+        echo "Migrating {{.APP}} from {{.SOURCE_PATH}} to PVC in namespace {{.NAMESPACE}}"
+
+        # Check if app is running and scale down
+        DEPLOYMENT=$(kubectl get deployment -n {{.NAMESPACE}} -l app.kubernetes.io/name={{.APP}} -o name 2>/dev/null || true)
+        if [ -n "$DEPLOYMENT" ]; then
+          echo "Scaling down $DEPLOYMENT..."
+          kubectl scale $DEPLOYMENT -n {{.NAMESPACE}} --replicas=0
+          kubectl wait --for=delete pod -l app.kubernetes.io/name={{.APP}} -n {{.NAMESPACE}} --timeout=120s || true
+        fi
+
+        # Create migration job
+        cat <<EOF | kubectl apply -f -
+        apiVersion: v1
+        kind: Pod
+        metadata:
+          name: migrate-{{.APP}}
+          namespace: {{.NAMESPACE}}
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: rsync
+            image: {{.RSYNC_IMAGE}}
+            command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Starting migration..."
+              rsync -avh --progress /source/ /dest/
+              echo "Migration complete!"
+              ls -la /dest/
+            volumeMounts:
+            - name: source
+              mountPath: /source
+              readOnly: true
+            - name: dest
+              mountPath: /dest
+          volumes:
+          - name: source
+            hostPath:
+              path: {{.SOURCE_PATH}}
+              type: Directory
+          - name: dest
+            persistentVolumeClaim:
+              claimName: {{.APP}}-config
+        EOF
+
+        # Wait for completion
+        kubectl wait --for=condition=Ready pod/migrate-{{.APP}} -n {{.NAMESPACE}} --timeout=60s
+        kubectl logs -f migrate-{{.APP}} -n {{.NAMESPACE}}
+        kubectl delete pod migrate-{{.APP}} -n {{.NAMESPACE}}
+
+        # Scale back up
+        if [ -n "$DEPLOYMENT" ]; then
+          echo "Scaling up $DEPLOYMENT..."
+          kubectl scale $DEPLOYMENT -n {{.NAMESPACE}} --replicas=1
+        fi
+    requires:
+      vars:
+        - APP
+        - NAMESPACE
+        - SOURCE_PATH
+
+  snapshot:
+    desc: Create a VolumeSnapshot for a PVC (vars PVC, NAMESPACE)
+    cmds:
+      - |
+        TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+        cat <<EOF | kubectl apply -f -
+        apiVersion: snapshot.storage.k8s.io/v1
+        kind: VolumeSnapshot
+        metadata:
+          name: {{.PVC}}-${TIMESTAMP}
+          namespace: {{.NAMESPACE}}
+        spec:
+          volumeSnapshotClassName: truenas-nfs-snapclass
+          source:
+            persistentVolumeClaimName: {{.PVC}}
+        EOF
+        echo "Created snapshot {{.PVC}}-${TIMESTAMP}"
+    requires:
+      vars:
+        - PVC
+        - NAMESPACE
+
+  snapshots:
+    desc: List all VolumeSnapshots across namespaces
+    cmds:
+      - kubectl get volumesnapshots -A
+
+  snapshots:ready:
+    desc: List ready VolumeSnapshots
+    cmds:
+      - kubectl get volumesnapshots -A -o jsonpath='{range .items[?(@.status.readyToUse==true)]}{.metadata.namespace}/{.metadata.name} - {.status.restoreSize}{"\n"}{end}'
+
+  pvc:
+    desc: List all PVCs with storage class
+    cmds:
+      - kubectl get pvc -A -o custom-columns='NAMESPACE:.metadata.namespace,NAME:.metadata.name,STATUS:.status.phase,STORAGECLASS:.spec.storageClassName,SIZE:.spec.resources.requests.storage'
+
+  sc:
+    desc: List storage classes
+    cmds:
+      - kubectl get storageclass
+
+  pv:
+    desc: List persistent volumes
+    cmds:
+      - kubectl get pv
+
+  csi:status:
+    desc: Check democratic-csi status
+    cmds:
+      - kubectl get pods -n democratic-csi
+      - kubectl get csidrivers

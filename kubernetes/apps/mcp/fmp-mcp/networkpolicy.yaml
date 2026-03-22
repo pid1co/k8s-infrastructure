@@ -1,0 +1,46 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: fmp-mcp-policy
+  namespace: mcp-servers
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: fmp-mcp
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow from openclaw-trading namespace
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              openclaw.io/instance: trading
+      ports:
+        - protocol: TCP
+          port: 8080
+    # Allow from openclaw-signals namespace
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              openclaw.io/instance: signals
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # FMP API
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443

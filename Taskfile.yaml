@@ -1,0 +1,45 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+vars:
+  KUBERNETES_DIR: "{{.ROOT_DIR}}/kubernetes"
+  CLUSTER_NAME: homelab
+
+env:
+  KUBECONFIG: "{{.ROOT_DIR}}/kubeconfig"
+
+includes:
+  bootstrap: .taskfiles/bootstrap.yaml
+  flux: .taskfiles/flux.yaml
+  cluster: .taskfiles/cluster.yaml
+  secrets: .taskfiles/secrets.yaml
+  storage: .taskfiles/storage.yaml
+  vpa: .taskfiles/vpa.yaml
+  validate: .taskfiles/validate.yaml
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  init:
+    desc: Initialize the repository (install dependencies)
+    cmds:
+      - |
+        echo "Checking dependencies..."
+        command -v kubectl >/dev/null 2>&1 || { echo "kubectl is required"; exit 1; }
+        command -v helm >/dev/null 2>&1 || { echo "helm is required"; exit 1; }
+        command -v flux >/dev/null 2>&1 || { echo "flux is required"; exit 1; }
+        command -v cilium >/dev/null 2>&1 || { echo "cilium CLI is required"; exit 1; }
+        command -v sops >/dev/null 2>&1 || { echo "sops is required"; exit 1; }
+        command -v yq >/dev/null 2>&1 || { echo "yq is required"; exit 1; }
+        command -v kustomize >/dev/null 2>&1 || { echo "kustomize is required"; exit 1; }
+        command -v kubeconform >/dev/null 2>&1 || { echo "kubeconform is required"; exit 1; }
+        echo "All dependencies installed!"
+
+  verify:
+    desc: Verify cluster connectivity
+    cmds:
+      - kubectl cluster-info
+      - kubectl get nodes -o wide

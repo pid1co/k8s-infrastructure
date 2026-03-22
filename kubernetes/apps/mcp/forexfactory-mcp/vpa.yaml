@@ -1,0 +1,22 @@
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: forexfactory-mcp
+  namespace: mcp-servers
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: forexfactory-mcp
+  updatePolicy:
+    updateMode: "Off"
+  resourcePolicy:
+    containerPolicies:
+      - containerName: forexfactory-mcp
+        minAllowed:
+          cpu: 25m
+          memory: 32Mi
+        maxAllowed:
+          cpu: 200m
+          memory: 256Mi

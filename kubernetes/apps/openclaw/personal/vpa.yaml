@@ -1,0 +1,36 @@
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: openclaw-personal
+  namespace: openclaw-personal
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: openclaw-personal
+  updatePolicy:
+    updateMode: "Off"
+  resourcePolicy:
+    containerPolicies:
+      - containerName: openclaw
+        minAllowed:
+          cpu: 100m
+          memory: 256Mi
+        maxAllowed:
+          cpu: 2
+          memory: 2Gi
+      - containerName: chromium
+        minAllowed:
+          cpu: 100m
+          memory: 256Mi
+        maxAllowed:
+          cpu: 1
+          memory: 2Gi
+      - containerName: kubernetes-mcp
+        minAllowed:
+          cpu: 25m
+          memory: 32Mi
+        maxAllowed:
+          cpu: 200m
+          memory: 256Mi

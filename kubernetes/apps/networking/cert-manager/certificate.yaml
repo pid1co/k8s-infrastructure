@@ -1,0 +1,21 @@
+---
+# Wildcard certificate for *.ts.pid1.co
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-ts-pid1-co
+  namespace: traefik
+spec:
+  secretName: wildcard-ts-tls
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  dnsNames:
+    - "*.ts.pid1.co"
+    - "ts.pid1.co"
+  # Also include base domain for flexibility
+  # - "*.pid1.co"
+  # - "pid1.co"
+---
+# Copy the wildcard cert secret to other namespaces that need it
+# Using Reflector or manual approach - for now, apps will reference traefik namespace

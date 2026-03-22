@@ -1,0 +1,86 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+tasks:
+  all:
+    desc: Run all validation checks
+    cmds:
+      - task: yaml
+      - task: kustomize
+      - task: kubeconform
+
+  yaml:
+    desc: Validate YAML syntax with yq
+    cmds:
+      - |
+        echo "Validating YAML syntax..."
+        errors=0
+        for f in $(find . -name "*.yaml" -path "*/kubernetes/*"); do
+          if ! yq '.' "$f" > /dev/null 2>&1; then
+            echo "INVALID: $f"
+            errors=$((errors + 1))
+          fi
+        done
+        if [ $errors -eq 0 ]; then
+          echo "All YAML files are syntactically valid"
+        else
+          echo "Found $errors invalid files"
+          exit 1
+        fi
+
+  kustomize:
+    desc: Validate kustomization builds
+    cmds:
+      - |
+        echo "Building k8s-infrastructure kustomizations..."
+        kustomize build kubernetes/apps/ > /dev/null
+        echo "k8s-infrastructure: OK"
+      - |
+        echo "Building k8s-apps kustomizations..."
+        kustomize build ../k8s-apps/kubernetes/apps/ > /dev/null
+        echo "k8s-apps: OK"
+
+  kubeconform:
+    desc: Validate Kubernetes schemas with kubeconform
+    cmds:
+      - |
+        echo "Validating k8s-infrastructure..."
+        kustomize build kubernetes/apps/ | kubeconform -strict -ignore-missing-schemas -summary
+      - |
+        echo "Validating k8s-apps..."
+        kustomize build ../k8s-apps/kubernetes/apps/ | kubeconform -strict -ignore-missing-schemas -summary
+
+  kubeconform:verbose:
+    desc: Validate with kubeconform (verbose, shows skipped)
+    cmds:
+      - |
+        echo "Validating k8s-infrastructure..."
+        kustomize build kubernetes/apps/ | kubeconform -strict -ignore-missing-schemas -output json | jq -r '.filename + ": " + .status'
+      - |
+        echo "Validating k8s-apps..."
+        kustomize build ../k8s-apps/kubernetes/apps/ | kubeconform -strict -ignore-missing-schemas -output json | jq -r '.filename + ": " + .status'
+
+  refs:
+    desc: Verify kustomization resource references exist
+    cmds:
+      - |
+        echo "Checking kustomization references..."
+        errors=0
+        for kust in $(find . -name "kustomization.yaml"); do
+          dir=$(dirname "$kust")
+          for res in $(yq -r '.resources[]' "$kust" 2>/dev/null); do
+            if [[ "$res" != http* && "$res" != "null" ]]; then
+              path="$dir/$res"
+              if [[ ! -e "$path" && ! -e "$path.yaml" && ! -d "$path" ]]; then
+                echo "MISSING: $path (referenced in $kust)"
+                errors=$((errors + 1))
+              fi
+            fi
+          done
+        done
+        if [ $errors -eq 0 ]; then
+          echo "All kustomization references valid"
+        else
+          echo "Found $errors missing references"
+          exit 1
+        fi

@@ -1,0 +1,42 @@
+# Environment and secrets
+.env
+.env.*
+*.secret
+secrets/
+
+# MiniJinja config (contains local paths)
+.minijinja.toml
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Terraform (if used)
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# Kubeconfig
+kubeconfig
+*.kubeconfig
+
+# Temporary files
+tmp/
+*.tmp
+*.bak
+
+# SOPS
+*.dec
+*.decrypted
+
+# Helm
+charts/
+*.tgz

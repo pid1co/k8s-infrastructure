@@ -1,0 +1,63 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: external-dns
+  namespace: networking
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: external-dns
+      version: "1.15.0"
+      sourceRef:
+        kind: HelmRepository
+        name: external-dns
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    # Provider
+    provider:
+      name: cloudflare
+
+    # Cloudflare configuration
+    env:
+      - name: CF_API_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: cloudflare-api-token
+            key: api-token
+
+    # Domain filter - only manage ts.pid1.co subdomain
+    domainFilters:
+      - ts.pid1.co
+
+    # Policy - sync will create and delete records
+    policy: sync
+
+    # Don't proxy through Cloudflare (direct to Tailscale IPs)
+    extraArgs:
+      - --cloudflare-proxied=false
+
+    # Sources to watch
+    sources:
+      - ingress
+      - service
+
+    # TXT record configuration
+    txtOwnerId: homelab-k8s
+    txtPrefix: externaldns-
+
+    # Resources
+    resources:
+      requests:
+        cpu: 25m
+        memory: 64Mi
+      limits:
+        memory: 128Mi
