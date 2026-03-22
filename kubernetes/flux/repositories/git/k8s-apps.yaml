@@ -6,17 +6,17 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1h
-  url: https://github.com/${GITHUB_USER}/k8s-apps.git
+  url: ssh://git@github.com/pid1co/k8s-apps.git
   ref:
     branch: main
   secretRef:
     name: github-deploy-key
 ---
-# Note: Replace ${GITHUB_USER} with your actual GitHub username
+# Note: Replace pid1co with your actual GitHub username
 # The github-deploy-key secret must be created with a deploy key that has
 # read access to the private k8s-apps repository.
 #
 # Create the secret with:
 # flux create secret git github-deploy-key \
-#   --url=ssh://git@github.com/${GITHUB_USER}/k8s-apps.git \
+#   --url=ssh://git@github.com/pid1co/k8s-apps.git \
 #   --private-key-file=./deploy-key
