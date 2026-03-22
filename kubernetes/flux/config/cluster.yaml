@@ -13,6 +13,23 @@ spec:
     name: flux-system
   wait: true
 ---
+# Deploy external-secrets operator first (needed for ExternalSecret resources in other kustomizations)
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cluster-secrets
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./kubernetes/apps/secrets
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  dependsOn:
+    - name: cluster-repositories
+---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
@@ -27,7 +44,7 @@ spec:
     name: flux-system
   wait: true
   dependsOn:
-    - name: cluster-repositories
+    - name: cluster-secrets
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -48,22 +65,6 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-secrets
-  namespace: flux-system
-spec:
-  interval: 10m
-  path: ./kubernetes/apps/secrets
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  wait: true
-  dependsOn:
-    - name: cluster-storage
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
   name: cluster-gpu
   namespace: flux-system
 spec:
@@ -75,7 +76,7 @@ spec:
     name: flux-system
   wait: true
   dependsOn:
-    - name: cluster-secrets
+    - name: cluster-storage
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
