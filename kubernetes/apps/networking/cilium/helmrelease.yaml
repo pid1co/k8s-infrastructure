@@ -52,8 +52,9 @@ spec:
     bpf:
       masquerade: true
 
-    # Egress interface for masquerading
-    egressMasqueradeInterfaces: ens18
+    # Devices for BPF masquerading
+    devices:
+      - ens18
 
     # Native routing
     routingMode: native
