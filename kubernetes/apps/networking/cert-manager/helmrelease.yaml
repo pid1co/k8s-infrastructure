@@ -9,22 +9,22 @@ spec:
   chart:
     spec:
       chart: cert-manager
-      version: "v1.16.2"
+      version: "v1.20.0"
       sourceRef:
         kind: HelmRepository
         name: jetstack
         namespace: flux-system
   install:
-    crds: CreateReplace
+    crds: Skip  # CRDs installed separately via server-side apply
     remediation:
       retries: 3
   upgrade:
-    crds: CreateReplace
+    crds: Skip
     cleanupOnFail: true
     remediation:
       retries: 3
   values:
-    installCRDs: true
+    installCRDs: false  # CRDs managed separately
 
     # Prometheus metrics
     prometheus:
