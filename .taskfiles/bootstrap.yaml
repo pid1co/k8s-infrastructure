@@ -91,6 +91,47 @@ tasks:
         kubectl apply -f "https://raw.githubusercontent.com/external-secrets/external-secrets/{{.ESO_VERSION}}/deploy/crds/bundle.yaml" \
           --server-side --force-conflicts
 
+  cert-manager-crds:
+    desc: Install cert-manager CRDs (required before helm release)
+    vars:
+      CERT_MANAGER_VERSION: "v1.20.0"
+    cmds:
+      - |
+        kubectl apply -f "https://github.com/cert-manager/cert-manager/releases/download/{{.CERT_MANAGER_VERSION}}/cert-manager.crds.yaml" \
+          --server-side --force-conflicts
+
+  traefik-crds:
+    desc: Install Traefik CRDs (required before helm release)
+    vars:
+      TRAEFIK_VERSION: "34.3.0"
+    cmds:
+      - |
+        helm template traefik traefik/traefik --version {{.TRAEFIK_VERSION}} --include-crds | \
+          kubectl apply -f - --server-side --force-conflicts 2>/dev/null || \
+          helm template traefik traefik/traefik --version {{.TRAEFIK_VERSION}} --include-crds | \
+          grep -A 1000 "kind: CustomResourceDefinition" | \
+          kubectl apply -f - --server-side --force-conflicts
+    preconditions:
+      - sh: helm repo list | grep -q traefik
+        msg: "Run: helm repo add traefik https://traefik.github.io/charts && helm repo update"
+
+  vpa-crds:
+    desc: Install Vertical Pod Autoscaler CRDs
+    vars:
+      VPA_VERSION: "1.4.1"
+    cmds:
+      - |
+        kubectl apply -f "https://raw.githubusercontent.com/kubernetes/autoscaler/vertical-pod-autoscaler-{{.VPA_VERSION}}/vertical-pod-autoscaler/deploy/vpa-v1-crd-gen.yaml" \
+          --server-side --force-conflicts
+
+  crds:
+    desc: Install all required CRDs
+    cmds:
+      - task: external-secrets-crds
+      - task: cert-manager-crds
+      - task: traefik-crds
+      - task: vpa-crds
+
   flux:
     desc: Bootstrap Flux CD
     vars:
@@ -122,7 +163,7 @@ tasks:
       - task: k3s
       - task: cilium
       - task: namespaces
-      - task: external-secrets-crds
+      - task: crds
       - echo ""
       - echo "Next steps:"
       - echo "1. Run 'task bootstrap:onepassword' and follow instructions to create 1Password secret"

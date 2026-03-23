@@ -6,7 +6,8 @@ vars:
   CLUSTER_NAME: homelab
 
 env:
-  KUBECONFIG: "{{.ROOT_DIR}}/kubeconfig"
+  # Use k3s kubeconfig directly, or fall back to local copy
+  KUBECONFIG: '{{.KUBECONFIG | default "/etc/rancher/k3s/k3s.yaml"}}'
 
 includes:
   bootstrap: .taskfiles/bootstrap.yaml

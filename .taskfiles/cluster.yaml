@@ -92,3 +92,28 @@ tasks:
     desc: Debug network connectivity
     cmds:
       - kubectl run -it --rm debug-net --image=nicolaka/netshoot --restart=Never -- /bin/bash
+
+  tailscale:status:
+    desc: Check Tailscale operator status
+    cmds:
+      - kubectl get pods -n tailscale
+      - echo "---"
+      - kubectl get svc -A -l tailscale.com/managed=true 2>/dev/null || echo "No Tailscale-managed services yet"
+      - echo "---"
+      - kubectl logs -n tailscale -l app.kubernetes.io/name=tailscale-operator --tail=10 2>/dev/null || echo "Operator not running"
+
+  gpu:status:
+    desc: Check GPU operator status
+    cmds:
+      - kubectl get pods -n gpu-operator
+      - echo "---"
+      - kubectl get nodes -o custom-columns='NAME:.metadata.name,GPU:.status.allocatable.nvidia\.com/gpu' 2>/dev/null || echo "No GPU resources"
+
+  storage:status:
+    desc: Check democratic-csi and storage status
+    cmds:
+      - kubectl get pods -n democratic-csi
+      - echo "---"
+      - kubectl get sc
+      - echo "---"
+      - kubectl get pvc -A --no-headers | head -20

@@ -32,9 +32,9 @@ spec:
     driver:
       enabled: false  # Driver already installed on k3s host
 
-    # Container toolkit
+    # Container toolkit - disabled, running in docker-compose
     toolkit:
-      enabled: true
+      enabled: false
 
     # Device plugin
     devicePlugin:
