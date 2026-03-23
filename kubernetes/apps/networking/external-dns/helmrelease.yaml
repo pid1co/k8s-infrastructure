@@ -43,7 +43,7 @@ spec:
 
     # Don't proxy through Cloudflare (direct to Tailscale IPs)
     extraArgs:
-      - --cloudflare-proxied=false
+      cloudflare-proxied: "false"
 
     # Sources to watch
     sources:
