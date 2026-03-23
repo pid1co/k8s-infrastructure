@@ -18,6 +18,8 @@ spec:
         app.kubernetes.io/name: forexfactory-mcp
         app.kubernetes.io/component: mcp-server
     spec:
+      imagePullSecrets:
+        - name: ghcr-credentials
       containers:
         - name: forexfactory-mcp
           image: ghcr.io/pid1co/forexfactory-mcp-server:latest

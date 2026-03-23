@@ -18,6 +18,8 @@ spec:
         app.kubernetes.io/name: fmp-mcp
         app.kubernetes.io/component: mcp-server
     spec:
+      imagePullSecrets:
+        - name: ghcr-credentials
       containers:
         - name: fmp-mcp
           image: ghcr.io/pid1co/fmp-mcp-server:latest
