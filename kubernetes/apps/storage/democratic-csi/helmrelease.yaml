@@ -57,23 +57,6 @@ spec:
     controller:
       enabled: true
       strategy: node
-      externalProvisioner:
-        extraArgs:
-          - --leader-election=false
-          - --node-deployment=true
-          - --node-deployment-immediate-binding=false
-          - --feature-gates=Topology=true
-          - --strict-topology=true
-          - --enable-capacity=true
-          - --capacity-ownerref-level=1
-      externalResizer:
-        extraArgs:
-          - --leader-election=false
-          - --node-deployment=true
-      externalSnapshotter:
-        extraArgs:
-          - --leader-election=false
-          - --node-deployment=true
       resources:
         requests:
           cpu: 25m
