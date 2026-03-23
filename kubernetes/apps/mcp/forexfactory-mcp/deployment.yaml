@@ -23,7 +23,6 @@ spec:
       containers:
         - name: forexfactory-mcp
           image: ghcr.io/pid1co/forexfactory-mcp-server:latest
-          command: ["uv", "run", "ffcal-server"]
           args: ["--transport", "http", "--host", "0.0.0.0", "--port", "8080"]
           ports:
             - name: http
