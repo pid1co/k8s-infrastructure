@@ -20,9 +20,13 @@ spec:
     spec:
       containers:
         - name: forexfactory-mcp
-          image: ghcr.io/your-org/forexfactory-mcp-server:latest
+          image: ghcr.io/pid1co/forexfactory-mcp-server:latest
           env:
-            - name: MCP_SERVER_PORT
+            - name: FFCAL_TRANSPORT
+              value: "http"
+            - name: FFCAL_HOST
+              value: "0.0.0.0"
+            - name: FFCAL_PORT
               value: "8080"
           ports:
             - name: http
@@ -30,20 +34,20 @@ spec:
           resources:
             requests:
               cpu: 50m
-              memory: 64Mi
-            limits:
               memory: 128Mi
+            limits:
+              memory: 256Mi
           livenessProbe:
             httpGet:
               path: /health
               port: http
-            initialDelaySeconds: 10
+            initialDelaySeconds: 30
             periodSeconds: 30
           readinessProbe:
             httpGet:
               path: /health
               port: http
-            initialDelaySeconds: 5
+            initialDelaySeconds: 10
             periodSeconds: 10
 ---
 apiVersion: v1

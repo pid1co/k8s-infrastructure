@@ -1,0 +1,91 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+vars:
+  REGISTRY: ghcr.io
+  ORG: pid1co
+
+tasks:
+  build:all:
+    desc: Build all MCP containers locally
+    cmds:
+      - task: build:fmp
+      - task: build:forexfactory
+
+  build:fmp:
+    desc: Build FMP MCP Server container locally
+    vars:
+      REPO_URL: "https://github.com/imbenrabi/Financial-Modeling-Prep-MCP-Server.git"
+      IMAGE: "{{.REGISTRY}}/{{.ORG}}/fmp-mcp-server"
+    cmds:
+      - |
+        TMPDIR=$(mktemp -d)
+        trap "rm -rf $TMPDIR" EXIT
+        echo "Cloning FMP MCP Server..."
+        git clone --depth 1 {{.REPO_URL}} $TMPDIR
+        echo "Building container..."
+        docker build -t {{.IMAGE}}:latest -t {{.IMAGE}}:$(date +%Y%m%d) $TMPDIR
+        echo "Built: {{.IMAGE}}:latest"
+
+  build:forexfactory:
+    desc: Build ForexFactory MCP Server container locally
+    vars:
+      REPO_URL: "https://github.com/kjpou1/forexfactory-mcp.git"
+      IMAGE: "{{.REGISTRY}}/{{.ORG}}/forexfactory-mcp-server"
+    cmds:
+      - |
+        TMPDIR=$(mktemp -d)
+        trap "rm -rf $TMPDIR" EXIT
+        echo "Cloning ForexFactory MCP Server..."
+        git clone --depth 1 {{.REPO_URL}} $TMPDIR
+        echo "Building container..."
+        docker build -t {{.IMAGE}}:latest -t {{.IMAGE}}:$(date +%Y%m%d) $TMPDIR
+        echo "Built: {{.IMAGE}}:latest"
+
+  push:all:
+    desc: Push all MCP containers to registry
+    cmds:
+      - task: push:fmp
+      - task: push:forexfactory
+
+  push:fmp:
+    desc: Push FMP MCP Server container to registry
+    vars:
+      IMAGE: "{{.REGISTRY}}/{{.ORG}}/fmp-mcp-server"
+    cmds:
+      - docker push {{.IMAGE}}:latest
+      - docker push {{.IMAGE}}:$(date +%Y%m%d)
+
+  push:forexfactory:
+    desc: Push ForexFactory MCP Server container to registry
+    vars:
+      IMAGE: "{{.REGISTRY}}/{{.ORG}}/forexfactory-mcp-server"
+    cmds:
+      - docker push {{.IMAGE}}:latest
+      - docker push {{.IMAGE}}:$(date +%Y%m%d)
+
+  trigger:
+    desc: Trigger GitHub Actions workflow to build MCP containers
+    cmds:
+      - |
+        echo "Triggering MCP container build workflow..."
+        gh workflow run build-mcp-containers.yaml --repo {{.ORG}}/k8s-infrastructure
+        echo "Workflow triggered. Check status at:"
+        echo "https://github.com/{{.ORG}}/k8s-infrastructure/actions/workflows/build-mcp-containers.yaml"
+
+  status:
+    desc: Check MCP server pod status
+    cmds:
+      - kubectl get pods -n mcp-servers
+      - echo "---"
+      - kubectl get externalsecrets -n mcp-servers
+
+  logs:fmp:
+    desc: Stream FMP MCP Server logs
+    cmds:
+      - kubectl logs -n mcp-servers -l app.kubernetes.io/name=fmp-mcp -f --tail=100
+
+  logs:forexfactory:
+    desc: Stream ForexFactory MCP Server logs
+    cmds:
+      - kubectl logs -n mcp-servers -l app.kubernetes.io/name=forexfactory-mcp -f --tail=100

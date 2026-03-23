@@ -17,6 +17,7 @@ includes:
   storage: .taskfiles/storage.yaml
   vpa: .taskfiles/vpa.yaml
   validate: .taskfiles/validate.yaml
+  mcp: .taskfiles/mcp.yaml
 
 tasks:
   default:
