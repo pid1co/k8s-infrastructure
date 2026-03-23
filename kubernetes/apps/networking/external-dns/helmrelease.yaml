@@ -41,10 +41,6 @@ spec:
     # Policy - sync will create and delete records
     policy: sync
 
-    # Don't proxy through Cloudflare (direct to Tailscale IPs)
-    extraArgs:
-      - "--cloudflare-proxied=false"
-
     # Sources to watch
     sources:
       - ingress
