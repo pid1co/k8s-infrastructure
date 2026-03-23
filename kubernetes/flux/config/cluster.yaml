@@ -143,24 +143,3 @@ spec:
   wait: true
   dependsOn:
     - name: cluster-secrets
----
-# k8s-apps Kustomization (depends on infrastructure)
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: cluster-apps
-  namespace: flux-system
-spec:
-  interval: 10m
-  path: ./kubernetes/apps
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: k8s-apps
-  wait: true
-  dependsOn:
-    - name: cluster-networking
-    - name: cluster-storage
-    - name: cluster-secrets
-    - name: cluster-gpu
-    - name: cluster-observability
