@@ -52,10 +52,7 @@ spec:
           node-publish-secret:
           controller-expand-secret:
 
-    volumeSnapshotClasses:
-      - name: truenas-nfs-snapclass
-        deletionPolicy: Retain
-        parameters: {}
+    volumeSnapshotClasses: []
 
     controller:
       enabled: true
