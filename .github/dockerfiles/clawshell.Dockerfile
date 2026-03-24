@@ -26,10 +26,12 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=builder /app/target/release/clawshell /usr/local/bin/clawshell
 
-# Create config directory
-RUN mkdir -p /etc/clawshell
+# Create clawshell system user and config directory
+RUN useradd -r -s /bin/false clawshell && \
+    mkdir -p /etc/clawshell && \
+    chown clawshell:clawshell /etc/clawshell
 
 EXPOSE 8081
 
-ENTRYPOINT ["clawshell", "start"]
+ENTRYPOINT ["clawshell", "start", "--foreground"]
 CMD ["-c", "/etc/clawshell/config.toml"]
