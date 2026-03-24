@@ -27,10 +27,10 @@ spec:
             - /bin/sh
             - -c
             - |
-              mkdir -p /workspace/.openclaw
-              if [ ! -f /workspace/.openclaw/openclaw.json ]; then
-                cp /config-template/openclaw.json /workspace/.openclaw/openclaw.json
-                chown 1000:1000 /workspace/.openclaw/openclaw.json
+              mkdir -p /openclaw-data/.openclaw
+              if [ ! -f /openclaw-data/.openclaw/openclaw.json ]; then
+                cp /config-template/openclaw.json /openclaw-data/.openclaw/openclaw.json
+                chown 1000:1000 /openclaw-data/.openclaw/openclaw.json
                 echo "Config initialised from ConfigMap"
               else
                 echo "Config already exists, skipping"
@@ -38,16 +38,14 @@ spec:
           volumeMounts:
             - name: openclaw-config-template
               mountPath: /config-template
-            - name: workspace
-              mountPath: /workspace
+            - name: openclaw-data
+              mountPath: /openclaw-data
       containers:
         - name: openclaw
           image: ghcr.io/openclaw/openclaw:latest
           env:
             - name: NODE_OPTIONS
               value: "--max-old-space-size=1536"
-            - name: OPENCLAW_CONFIG
-              value: "/workspace/.openclaw/openclaw.json"
             # Real keys directly - no ClawShell on signals instance
             # NetworkPolicy provides protection by restricting egress
             - name: ANTHROPIC_API_KEY
@@ -91,10 +89,15 @@ spec:
           volumeMounts:
             - name: workspace
               mountPath: /workspace
+            - name: openclaw-data
+              mountPath: /home/node
       volumes:
         - name: workspace
           persistentVolumeClaim:
             claimName: openclaw-signals-workspace
+        - name: openclaw-data
+          persistentVolumeClaim:
+            claimName: openclaw-signals-data
         - name: openclaw-config-template
           configMap:
             name: openclaw-signals-config
@@ -111,6 +114,19 @@ spec:
   resources:
     requests:
       storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: openclaw-signals-data
+  namespace: openclaw-signals
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: truenas-nfs
+  resources:
+    requests:
+      storage: 1Gi
 ---
 apiVersion: v1
 kind: ServiceAccount
