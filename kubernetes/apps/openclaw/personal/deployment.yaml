@@ -55,7 +55,7 @@ spec:
               value: "virtual-key-personal-anthropic"
             # Route API calls through ClawShell proxy
             - name: ANTHROPIC_BASE_URL
-              value: "http://localhost:8081/proxy/anthropic"
+              value: "http://localhost:8081"
             # Telegram (real token - does not go through ClawShell)
             - name: TELEGRAM_BOT_TOKEN
               valueFrom:

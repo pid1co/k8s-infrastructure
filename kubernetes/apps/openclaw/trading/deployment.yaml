@@ -55,7 +55,7 @@ spec:
               value: "virtual-key-trading-anthropic"
             # Route Anthropic API calls through ClawShell proxy
             - name: ANTHROPIC_BASE_URL
-              value: "http://localhost:8081/proxy/anthropic"
+              value: "http://localhost:8081"
             # FMP uses real key directly (ClawShell only supports LLM providers)
             - name: FMP_API_KEY
               valueFrom:
