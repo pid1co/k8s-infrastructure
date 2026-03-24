@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - externalsecret.yaml
   - pushover-externalsecret.yaml
+  - openclaw-config.yaml
   - deployment.yaml
   - networkpolicy.yaml
   - vpa.yaml
