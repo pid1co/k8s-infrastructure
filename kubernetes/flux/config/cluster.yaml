@@ -143,3 +143,20 @@ spec:
   wait: true
   dependsOn:
     - name: cluster-secrets
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cluster-arc
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./kubernetes/apps/arc
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  dependsOn:
+    - name: cluster-stores
+    - name: cluster-storage
