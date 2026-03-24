@@ -4,5 +4,4 @@ kind: Kustomization
 resources:
   - externalsecret.yaml
   - deployment.yaml
-  - networkpolicy.yaml
   - vpa.yaml
