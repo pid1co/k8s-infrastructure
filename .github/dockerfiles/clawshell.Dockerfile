@@ -31,4 +31,5 @@ RUN mkdir -p /etc/clawshell
 
 EXPOSE 8081
 
-ENTRYPOINT ["clawshell"]
+ENTRYPOINT ["clawshell", "start"]
+CMD ["-c", "/etc/clawshell/config.toml"]
