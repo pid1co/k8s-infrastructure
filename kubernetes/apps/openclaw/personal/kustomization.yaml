@@ -6,6 +6,7 @@ resources:
   - clawshell-externalsecret.yaml
   - pushover-externalsecret.yaml
   - ghcr-credentials.yaml
+  - openclaw-config.yaml
   - deployment.yaml
   - networkpolicy.yaml
   - vpa.yaml

@@ -20,14 +20,34 @@ spec:
         app.kubernetes.io/instance: signals
     spec:
       serviceAccountName: openclaw-signals
+      initContainers:
+        - name: init-config
+          image: busybox
+          command:
+            - /bin/sh
+            - -c
+            - |
+              mkdir -p /workspace/.openclaw
+              if [ ! -f /workspace/.openclaw/openclaw.json ]; then
+                cp /config-template/openclaw.json /workspace/.openclaw/openclaw.json
+                chown 1000:1000 /workspace/.openclaw/openclaw.json
+                echo "Config initialised from ConfigMap"
+              else
+                echo "Config already exists, skipping"
+              fi
+          volumeMounts:
+            - name: openclaw-config-template
+              mountPath: /config-template
+            - name: workspace
+              mountPath: /workspace
       containers:
         - name: openclaw
           image: ghcr.io/openclaw/openclaw:latest
           env:
             - name: NODE_OPTIONS
               value: "--max-old-space-size=1536"
-            - name: OPENCLAW_CONFIG_PATH
-              value: "/etc/openclaw/openclaw.json"
+            - name: OPENCLAW_CONFIG
+              value: "/workspace/.openclaw/openclaw.json"
             # Real keys directly - no ClawShell on signals instance
             # NetworkPolicy provides protection by restricting egress
             - name: ANTHROPIC_API_KEY
@@ -71,13 +91,11 @@ spec:
           volumeMounts:
             - name: workspace
               mountPath: /workspace
-            - name: openclaw-config
-              mountPath: /etc/openclaw
       volumes:
         - name: workspace
           persistentVolumeClaim:
             claimName: openclaw-signals-workspace
-        - name: openclaw-config
+        - name: openclaw-config-template
           configMap:
             name: openclaw-signals-config
 ---
