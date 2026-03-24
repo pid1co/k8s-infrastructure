@@ -43,16 +43,14 @@ spec:
             limits:
               memory: 256Mi
           livenessProbe:
-            httpGet:
-              path: /healthz
+            tcpSocket:
               port: http
-            initialDelaySeconds: 30
+            initialDelaySeconds: 60
             periodSeconds: 30
           readinessProbe:
-            httpGet:
-              path: /healthz
+            tcpSocket:
               port: http
-            initialDelaySeconds: 10
+            initialDelaySeconds: 30
             periodSeconds: 10
 ---
 apiVersion: v1
