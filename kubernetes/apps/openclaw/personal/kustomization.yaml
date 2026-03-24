@@ -7,6 +7,7 @@ resources:
   - pushover-externalsecret.yaml
   - ghcr-credentials.yaml
   - openclaw-config.yaml
+  - nginx-config.yaml
   - deployment.yaml
   - networkpolicy.yaml
   - vpa.yaml

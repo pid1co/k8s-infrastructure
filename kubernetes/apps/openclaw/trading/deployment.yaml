@@ -32,11 +32,13 @@ spec:
               mkdir -p /openclaw-data/.openclaw
               chown -R 1000:1000 /openclaw-data/.openclaw
               chmod 755 /openclaw-data/.openclaw
-              # Always copy fresh config (temporary for fix)
-              rm -f /openclaw-data/.openclaw/openclaw.json
-              cp /config-template/openclaw.json /openclaw-data/.openclaw/openclaw.json
-              chown 1000:1000 /openclaw-data/.openclaw/openclaw.json
-              echo "Config initialised from ConfigMap"
+              if [ ! -f /openclaw-data/.openclaw/openclaw.json ]; then
+                cp /config-template/openclaw.json /openclaw-data/.openclaw/openclaw.json
+                chown 1000:1000 /openclaw-data/.openclaw/openclaw.json
+                echo "Config initialised from ConfigMap"
+              else
+                echo "Config already exists, skipping"
+              fi
           volumeMounts:
             - name: openclaw-config-template
               mountPath: /config-template

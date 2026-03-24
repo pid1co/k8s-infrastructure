@@ -53,9 +53,9 @@ spec:
             # Virtual key only - ClawShell swaps for real key
             - name: ANTHROPIC_API_KEY
               value: "virtual-key-personal-anthropic"
-            # Route API calls through ClawShell proxy
+            # Route API calls through nginx->ClawShell proxy
             - name: ANTHROPIC_BASE_URL
-              value: "http://localhost:8081"
+              value: "http://localhost:8082"
             # Telegram (real token - does not go through ClawShell)
             - name: TELEGRAM_BOT_TOKEN
               valueFrom:
@@ -129,6 +129,23 @@ spec:
             limits:
               memory: 1Gi
 
+        - name: nginx-proxy
+          image: nginx:alpine
+          ports:
+            - name: nginx
+              containerPort: 8082
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+
       volumes:
         - name: workspace
           persistentVolumeClaim:
@@ -142,6 +159,9 @@ spec:
         - name: openclaw-config-template
           configMap:
             name: openclaw-personal-config
+        - name: nginx-config
+          configMap:
+            name: nginx-header-transform
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

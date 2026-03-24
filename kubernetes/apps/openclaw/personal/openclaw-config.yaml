@@ -7,6 +7,17 @@ metadata:
 data:
   openclaw.json: |
     {
+      "models": {
+        "providers": {
+          "anthropic": {
+            "baseUrl": "http://localhost:8082",
+            "api": "anthropic-messages",
+            "models": [
+              {"name": "claude-sonnet-4-6", "id": "claude-sonnet-4-6"}
+            ]
+          }
+        }
+      },
       "agents": {
         "defaults": {
           "model": "anthropic/claude-sonnet-4-6",
