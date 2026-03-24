@@ -170,32 +170,6 @@ spec:
             name: nginx-header-transform
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: openclaw-trading-workspace
-  namespace: openclaw-trading
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: truenas-nfs
-  resources:
-    requests:
-      storage: 10Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: openclaw-trading-data
-  namespace: openclaw-trading
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: truenas-nfs
-  resources:
-    requests:
-      storage: 1Gi
----
-apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: openclaw-trading
