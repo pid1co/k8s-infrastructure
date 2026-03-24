@@ -12,7 +12,14 @@ spec:
     - Ingress
     - Egress
   ingress:
-    # Allow from openclaw-trading namespace only
+    # Allow kubelet health checks (from node network)
+    - from:
+        - ipBlock:
+            cidr: 192.168.0.0/16
+      ports:
+        - protocol: TCP
+          port: 8080
+    # Allow from openclaw-trading namespace
     - from:
         - namespaceSelector:
             matchLabels:
