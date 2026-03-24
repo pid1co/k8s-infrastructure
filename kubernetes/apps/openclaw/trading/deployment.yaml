@@ -55,7 +55,7 @@ spec:
               value: "virtual-key-trading-anthropic"
             # Route Anthropic API calls through ClawShell proxy
             - name: ANTHROPIC_BASE_URL
-              value: "http://localhost:8081"
+              value: "http://localhost:8082"
             # FMP uses real key directly (ClawShell only supports LLM providers)
             - name: FMP_API_KEY
               valueFrom:
@@ -135,6 +135,23 @@ spec:
             limits:
               memory: 1Gi
 
+        - name: nginx-proxy
+          image: nginx:alpine
+          ports:
+            - name: nginx
+              containerPort: 8082
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+
       volumes:
         - name: workspace
           persistentVolumeClaim:
@@ -148,6 +165,9 @@ spec:
         - name: openclaw-config-template
           configMap:
             name: openclaw-trading-config
+        - name: nginx-config
+          configMap:
+            name: nginx-header-transform
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

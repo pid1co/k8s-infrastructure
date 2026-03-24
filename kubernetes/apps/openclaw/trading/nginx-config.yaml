@@ -1,0 +1,42 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-header-transform
+  namespace: openclaw-trading
+data:
+  nginx.conf: |
+    worker_processes 1;
+    error_log /dev/stderr info;
+
+    events {
+      worker_connections 1024;
+    }
+
+    http {
+      access_log /dev/stdout;
+
+      server {
+        listen 8082;
+
+        location / {
+          # Transform x-api-key to Authorization: Bearer
+          set $auth_header $http_x_api_key;
+          proxy_set_header Authorization "Bearer $auth_header";
+
+          # Remove x-api-key from forwarded request
+          proxy_set_header x-api-key "";
+
+          # Forward all other headers
+          proxy_pass_request_headers on;
+
+          # Proxy to ClawShell
+          proxy_pass http://127.0.0.1:8081;
+          proxy_http_version 1.1;
+          proxy_set_header Host api.anthropic.com;
+          proxy_set_header Connection "";
+          proxy_buffering off;
+          proxy_read_timeout 300s;
+        }
+      }
+    }
