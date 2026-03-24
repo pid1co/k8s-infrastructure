@@ -12,13 +12,8 @@ spec:
     - Ingress
     - Egress
   ingress:
-    # Allow kubelet health checks (from node and pod networks)
-    - from:
-        - ipBlock:
-            cidr: 10.42.0.0/16
-        - ipBlock:
-            cidr: 192.168.0.0/16
-      ports:
+    # Allow kubelet health checks (open to all for probes - Cilium routes from various sources)
+    - ports:
         - protocol: TCP
           port: 8080
     # Allow from openclaw-trading namespace

@@ -12,29 +12,9 @@ spec:
     - Ingress
     - Egress
   ingress:
-    # Allow kubelet health checks (from node and pod networks)
-    - from:
-        - ipBlock:
-            cidr: 10.42.0.0/16
-        - ipBlock:
-            cidr: 192.168.0.0/16
-      ports:
-        - protocol: TCP
-          port: 8080
-    # Allow from openclaw-trading namespace
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              openclaw.io/instance: trading
-      ports:
-        - protocol: TCP
-          port: 8080
-    # Allow from openclaw-signals namespace
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              openclaw.io/instance: signals
-      ports:
+    # Allow all traffic to MCP port (health checks + API calls)
+    # More restrictive rules can be added later if needed
+    - ports:
         - protocol: TCP
           port: 8080
   egress:
