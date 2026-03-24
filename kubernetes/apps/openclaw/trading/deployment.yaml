@@ -20,6 +20,8 @@ spec:
         app.kubernetes.io/instance: trading
     spec:
       serviceAccountName: openclaw-trading
+      imagePullSecrets:
+        - name: ghcr-credentials
       containers:
         - name: openclaw
           image: ghcr.io/openclaw/openclaw:latest
@@ -72,7 +74,7 @@ spec:
           # Note: openclaw container has NO access to clawshell-config volume
 
         - name: clawshell
-          image: ghcr.io/clawshell/clawshell:latest
+          image: ghcr.io/pid1co/clawshell:latest
           ports:
             - name: proxy
               containerPort: 8081
