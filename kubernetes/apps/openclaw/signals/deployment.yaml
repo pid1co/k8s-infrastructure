@@ -26,8 +26,8 @@ spec:
           env:
             - name: NODE_OPTIONS
               value: "--max-old-space-size=1536"
-            - name: OPENCLAW_MODEL
-              value: "claude-haiku-4-5"
+            - name: OPENCLAW_CONFIG_PATH
+              value: "/etc/openclaw/openclaw.json"
             # Real keys directly - no ClawShell on signals instance
             # NetworkPolicy provides protection by restricting egress
             - name: ANTHROPIC_API_KEY
@@ -72,8 +72,7 @@ spec:
             - name: workspace
               mountPath: /workspace
             - name: openclaw-config
-              mountPath: /home/node/.openclaw/openclaw.json
-              subPath: openclaw.json
+              mountPath: /etc/openclaw
       volumes:
         - name: workspace
           persistentVolumeClaim:
