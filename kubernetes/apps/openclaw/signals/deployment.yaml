@@ -27,7 +27,7 @@ spec:
             - name: NODE_OPTIONS
               value: "--max-old-space-size=1536"
             - name: OPENCLAW_MODEL
-              value: "claude-haiku-4-5-20251001"
+              value: "claude-haiku-4-5"
             # Real keys directly - no ClawShell on signals instance
             # NetworkPolicy provides protection by restricting egress
             - name: ANTHROPIC_API_KEY
