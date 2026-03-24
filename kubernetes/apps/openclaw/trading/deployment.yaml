@@ -26,6 +26,8 @@ spec:
         - name: openclaw
           image: ghcr.io/openclaw/openclaw:latest
           env:
+            - name: NODE_OPTIONS
+              value: "--max-old-space-size=1536"
             - name: OPENCLAW_MODEL
               value: "claude-opus-4-6"
             # Virtual keys only - ClawShell swaps for real keys
