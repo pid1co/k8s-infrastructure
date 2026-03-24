@@ -79,7 +79,7 @@ spec:
 
         - name: clawshell
           image: ghcr.io/pid1co/clawshell:latest
-          args: ["start", "-c", "/etc/clawshell/config.toml"]
+          args: ["start", "--foreground", "-c", "/etc/clawshell/config.toml"]
           ports:
             - name: proxy
               containerPort: 8081
