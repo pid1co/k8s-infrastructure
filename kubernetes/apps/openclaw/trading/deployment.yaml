@@ -29,15 +29,11 @@ spec:
             # Virtual keys only - ClawShell swaps for real keys
             - name: ANTHROPIC_API_KEY
               value: "virtual-key-trading-anthropic"
-            - name: OANDA_API_KEY
-              value: "virtual-key-trading-oanda"
             - name: FMP_API_KEY
               value: "virtual-key-trading-fmp"
             # Route API calls through ClawShell proxy
             - name: ANTHROPIC_BASE_URL
               value: "http://localhost:8081/proxy/anthropic"
-            - name: OANDA_BASE_URL
-              value: "http://localhost:8081/proxy/oanda"
             - name: FMP_BASE_URL
               value: "http://localhost:8081/proxy/fmp"
             # Telegram (real token - does not go through ClawShell)
@@ -109,7 +105,7 @@ spec:
             periodSeconds: 5
 
         - name: chromium
-          image: browserless/chromium:latest
+          image: browserless/chrome:latest
           ports:
             - name: chromium
               containerPort: 3000

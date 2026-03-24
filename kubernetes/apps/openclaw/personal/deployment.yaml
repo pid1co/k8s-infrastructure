@@ -101,7 +101,7 @@ spec:
             periodSeconds: 5
 
         - name: chromium
-          image: browserless/chromium:latest
+          image: browserless/chrome:latest
           ports:
             - name: chromium
               containerPort: 3000
