@@ -30,16 +30,18 @@ spec:
               value: "--max-old-space-size=1536"
             - name: OPENCLAW_MODEL
               value: "claude-opus-4-6"
-            # Virtual keys only - ClawShell swaps for real keys
+            # Virtual key - ClawShell swaps for real key
             - name: ANTHROPIC_API_KEY
               value: "virtual-key-trading-anthropic"
-            - name: FMP_API_KEY
-              value: "virtual-key-trading-fmp"
-            # Route API calls through ClawShell proxy
+            # Route Anthropic API calls through ClawShell proxy
             - name: ANTHROPIC_BASE_URL
               value: "http://localhost:8081/proxy/anthropic"
-            - name: FMP_BASE_URL
-              value: "http://localhost:8081/proxy/fmp"
+            # FMP uses real key directly (ClawShell only supports LLM providers)
+            - name: FMP_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: openclaw-trading-secrets
+                  key: fmp-api-key
             # Telegram (real token - does not go through ClawShell)
             - name: TELEGRAM_BOT_TOKEN
               valueFrom:
