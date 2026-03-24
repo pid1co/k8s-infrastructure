@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+tasks:
+  pairing:trading:
+    desc: Approve Telegram pairing for openclaw-trading
+    vars:
+      CODE: '{{.CODE}}'
+    preconditions:
+      - sh: '[ -n "{{.CODE}}" ]'
+        msg: "Usage: task openclaw:pairing:trading CODE=<pairing-code>"
+    cmds:
+      - kubectl exec -n openclaw-trading $(kubectl get pod -n openclaw-trading -o name | head -1) -c openclaw -- openclaw pairing approve telegram {{.CODE}}
+
+  pairing:personal:
+    desc: Approve Telegram pairing for openclaw-personal
+    vars:
+      CODE: '{{.CODE}}'
+    preconditions:
+      - sh: '[ -n "{{.CODE}}" ]'
+        msg: "Usage: task openclaw:pairing:personal CODE=<pairing-code>"
+    cmds:
+      - kubectl exec -n openclaw-personal $(kubectl get pod -n openclaw-personal -o name | head -1) -c openclaw -- openclaw pairing approve telegram {{.CODE}}
+
+  pairing:signals:
+    desc: Approve Telegram pairing for openclaw-signals
+    vars:
+      CODE: '{{.CODE}}'
+    preconditions:
+      - sh: '[ -n "{{.CODE}}" ]'
+        msg: "Usage: task openclaw:pairing:signals CODE=<pairing-code>"
+    cmds:
+      - kubectl exec -n openclaw-signals $(kubectl get pod -n openclaw-signals -o name | head -1) -c openclaw -- openclaw pairing approve telegram {{.CODE}}
+
+  logs:trading:
+    desc: Tail logs for openclaw-trading
+    cmds:
+      - kubectl logs -n openclaw-trading -l app.kubernetes.io/instance=trading -c openclaw -f --tail=100
+
+  logs:personal:
+    desc: Tail logs for openclaw-personal
+    cmds:
+      - kubectl logs -n openclaw-personal -l app.kubernetes.io/instance=personal -c openclaw -f --tail=100
+
+  logs:signals:
+    desc: Tail logs for openclaw-signals
+    cmds:
+      - kubectl logs -n openclaw-signals -l app.kubernetes.io/instance=signals -c openclaw -f --tail=100
+
+  restart:trading:
+    desc: Restart openclaw-trading deployment
+    cmds:
+      - kubectl rollout restart deployment -n openclaw-trading openclaw-trading
+
+  restart:personal:
+    desc: Restart openclaw-personal deployment
+    cmds:
+      - kubectl rollout restart deployment -n openclaw-personal openclaw-personal
+
+  restart:signals:
+    desc: Restart openclaw-signals deployment
+    cmds:
+      - kubectl rollout restart deployment -n openclaw-signals openclaw-signals
+
+  status:
+    desc: Show status of all openclaw instances
+    cmds:
+      - |
+        echo "=== OpenClaw Pods ==="
+        kubectl get pods -n openclaw-trading -l app.kubernetes.io/name=openclaw
+        kubectl get pods -n openclaw-personal -l app.kubernetes.io/name=openclaw
+        kubectl get pods -n openclaw-signals -l app.kubernetes.io/name=openclaw

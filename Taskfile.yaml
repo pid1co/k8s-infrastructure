@@ -18,6 +18,7 @@ includes:
   vpa: .taskfiles/vpa.yaml
   validate: .taskfiles/validate.yaml
   mcp: .taskfiles/mcp.yaml
+  openclaw: .taskfiles/openclaw.yaml
 
 tasks:
   default:
