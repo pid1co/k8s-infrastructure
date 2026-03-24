@@ -7,6 +7,14 @@ metadata:
 data:
   openclaw.json: |
     {
+      "models": {
+        "providers": {
+          "anthropic": {
+            "baseUrl": "http://localhost:8082",
+            "api": "anthropic-messages"
+          }
+        }
+      },
       "agents": {
         "defaults": {
           "model": "anthropic/claude-opus-4-6",
