@@ -12,8 +12,10 @@ spec:
     - Ingress
     - Egress
   ingress:
-    # Allow kubelet health checks (from node network)
+    # Allow kubelet health checks (from node and pod networks)
     - from:
+        - ipBlock:
+            cidr: 10.42.0.0/16
         - ipBlock:
             cidr: 192.168.0.0/16
       ports:
