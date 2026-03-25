@@ -14,3 +14,4 @@ resources:
   - fairwinds-stable.yaml
   - authentik.yaml
   - external-dns.yaml
+  - onepassword.yaml
