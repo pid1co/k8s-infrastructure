@@ -7,5 +7,4 @@ resources:
   - secrets
   - gpu
   - observability
-  - openclaw
   - mcp
