@@ -154,11 +154,13 @@ spec:
 
       volumes:
         - name: workspace
-          persistentVolumeClaim:
-            claimName: openclaw-trading-workspace
+          hostPath:
+            path: /mnt/user/appdata/openclaw-trading/workspace
+            type: DirectoryOrCreate
         - name: openclaw-data
-          persistentVolumeClaim:
-            claimName: openclaw-trading-data
+          hostPath:
+            path: /mnt/user/appdata/openclaw-trading/data
+            type: DirectoryOrCreate
         - name: clawshell-config
           secret:
             secretName: clawshell-trading-config

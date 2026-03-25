@@ -95,11 +95,13 @@ spec:
               mountPath: /home/node
       volumes:
         - name: workspace
-          persistentVolumeClaim:
-            claimName: openclaw-signals-workspace
+          hostPath:
+            path: /mnt/user/appdata/openclaw-signals/workspace
+            type: DirectoryOrCreate
         - name: openclaw-data
-          persistentVolumeClaim:
-            claimName: openclaw-signals-data
+          hostPath:
+            path: /mnt/user/appdata/openclaw-signals/data
+            type: DirectoryOrCreate
         - name: openclaw-config-template
           configMap:
             name: openclaw-signals-config

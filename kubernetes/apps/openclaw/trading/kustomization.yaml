@@ -8,7 +8,6 @@ resources:
   - ghcr-credentials.yaml
   - openclaw-config.yaml
   - nginx-config.yaml
-  - storage.yaml
   - deployment.yaml
   - networkpolicy.yaml
   - vpa.yaml

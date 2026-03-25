@@ -148,11 +148,13 @@ spec:
 
       volumes:
         - name: workspace
-          persistentVolumeClaim:
-            claimName: openclaw-personal-workspace
+          hostPath:
+            path: /mnt/user/appdata/openclaw-personal/workspace
+            type: DirectoryOrCreate
         - name: openclaw-data
-          persistentVolumeClaim:
-            claimName: openclaw-personal-data
+          hostPath:
+            path: /mnt/user/appdata/openclaw-personal/data
+            type: DirectoryOrCreate
         - name: clawshell-config
           secret:
             secretName: clawshell-personal-config
