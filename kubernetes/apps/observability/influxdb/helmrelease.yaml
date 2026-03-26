@@ -28,7 +28,7 @@ spec:
         username: admin
         org: homelab
         bucket: default
-        # Password will be auto-generated and stored in secret
+      existingSecret: influxdb-credentials
     persistence:
       enabled: true
       size: 10Gi
