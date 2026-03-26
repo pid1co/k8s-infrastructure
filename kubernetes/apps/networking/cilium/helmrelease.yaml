@@ -52,9 +52,13 @@ spec:
     bpf:
       masquerade: true
 
+    # Use correct source IP based on route
+    enableMasqueradeRouteSource: true
+
     # Devices for BPF masquerading
     devices:
       - ens18
+      - enp3s0np0
 
     # Native routing
     routingMode: native
