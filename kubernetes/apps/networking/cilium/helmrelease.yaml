@@ -48,17 +48,24 @@ spec:
     socketLB:
       hostNamespaceOnly: true
 
-    # Use iptables masquerading with route-source support
+    # BPF masquerading
     bpf:
-      masquerade: false
+      masquerade: true
 
-    # Use correct source IP based on route
-    enableMasqueradeRouteSource: true
-
-    # Devices
+    # Devices for BPF masquerading
     devices:
       - ens18
       - enp3s0np0
+
+    # IP Masq Agent - traffic to CIDRs listed here will NOT be masqueraded
+    # 192.168.254.0/30 (PostgreSQL/Redis) is excluded so it WILL be masqueraded
+    ipMasqAgent:
+      enabled: true
+      config:
+        nonMasqueradeCIDRs:
+          - 10.0.0.0/8
+          - 172.16.0.0/12
+          - 192.168.168.0/24  # Node network - no masquerade needed
 
     # Native routing
     routingMode: native
@@ -66,5 +73,6 @@ spec:
     ipv4NativeRoutingCIDR: 10.42.0.0/16
 
     # Performance optimizations
+    installNoConntrackIptablesRules: true
     endpointRoutes:
       enabled: true
