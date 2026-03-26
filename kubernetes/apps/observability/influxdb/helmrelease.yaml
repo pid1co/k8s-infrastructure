@@ -1,0 +1,44 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: influxdb
+  namespace: observability
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: influxdb
+      version: "6.*"
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    auth:
+      enabled: true
+      admin:
+        username: admin
+        org: homelab
+        bucket: default
+        # Password will be auto-generated and stored in secret
+    influxdb:
+      extraEnvVars:
+        - name: INFLUXDB_HTTP_AUTH_ENABLED
+          value: "true"
+    persistence:
+      enabled: true
+      size: 10Gi
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        memory: 1Gi

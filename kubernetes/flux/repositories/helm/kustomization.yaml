@@ -15,3 +15,5 @@ resources:
   - authentik.yaml
   - external-dns.yaml
   - onepassword.yaml
+  - grafana.yaml
+  - bitnami.yaml
