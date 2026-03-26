@@ -8,11 +8,11 @@ spec:
   interval: 30m
   chart:
     spec:
-      chart: influxdb
-      version: "6.*"
+      chart: influxdb2
+      version: "2.*"
       sourceRef:
         kind: HelmRepository
-        name: bitnami
+        name: influxdata
         namespace: flux-system
   install:
     remediation:
@@ -22,12 +22,10 @@ spec:
     remediation:
       retries: 3
   values:
-    auth:
-      enabled: true
-      admin:
-        username: admin
-        org: homelab
-        bucket: default
+    adminUser:
+      organization: homelab
+      bucket: default
+      user: admin
       existingSecret: influxdb-credentials
     persistence:
       enabled: true

@@ -17,3 +17,4 @@ resources:
   - onepassword.yaml
   - grafana.yaml
   - bitnami.yaml
+  - influxdata.yaml
