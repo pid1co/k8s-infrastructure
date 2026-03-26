@@ -57,17 +57,7 @@ spec:
       - ens18
       - enp3s0np0
 
-    # IP Masq Agent - traffic to CIDRs listed here will NOT be masqueraded
-    ipMasqAgent:
-      enabled: true
-      config:
-        nonMasqueradeCIDRs:
-          - 10.0.0.0/8
-          - 172.16.0.0/12
-          - 192.168.168.0/24
-          - 192.168.100.0/24
-
-    # Native routing
+    # Native routing - traffic to this CIDR will NOT be masqueraded
     routingMode: native
     autoDirectNodeRoutes: true
     ipv4NativeRoutingCIDR: 10.42.0.0/16
