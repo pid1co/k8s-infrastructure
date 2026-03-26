@@ -66,6 +66,5 @@ spec:
     ipv4NativeRoutingCIDR: 10.42.0.0/16
 
     # Performance optimizations
-    installNoConntrackIptablesRules: true
     endpointRoutes:
       enabled: true
