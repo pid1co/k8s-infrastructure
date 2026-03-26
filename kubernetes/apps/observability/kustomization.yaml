@@ -6,5 +6,5 @@ resources:
   - vpa
   - influxdb
   - grafana-operator
-  # grafana and grafana-mcp require the operator CRDs to be installed first
-  # They will be added after operator is running
+  - grafana
+  - grafana-mcp
