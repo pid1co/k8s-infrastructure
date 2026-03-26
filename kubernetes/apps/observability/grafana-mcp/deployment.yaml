@@ -24,7 +24,7 @@ spec:
           args:
             - "-t"
             - "streamable-http"
-            - "-addr"
+            - "-address"
             - ":8000"
           env:
             - name: GRAFANA_URL
