@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: cilium
-      version: "1.19.1"
+      version: "1.19.2"
       sourceRef:
         kind: HelmRepository
         name: cilium
@@ -48,14 +48,14 @@ spec:
     socketLB:
       hostNamespaceOnly: true
 
-    # BPF masquerading
+    # Use iptables masquerading with route-source support
     bpf:
-      masquerade: true
+      masquerade: false
 
     # Use correct source IP based on route
     enableMasqueradeRouteSource: true
 
-    # Devices for BPF masquerading
+    # Devices
     devices:
       - ens18
       - enp3s0np0
