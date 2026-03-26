@@ -58,14 +58,14 @@ spec:
       - enp3s0np0
 
     # IP Masq Agent - traffic to CIDRs listed here will NOT be masqueraded
-    # 192.168.254.0/30 (PostgreSQL/Redis) is excluded so it WILL be masqueraded
     ipMasqAgent:
       enabled: true
       config:
         nonMasqueradeCIDRs:
           - 10.0.0.0/8
           - 172.16.0.0/12
-          - 192.168.168.0/24  # Node network - no masquerade needed
+          - 192.168.168.0/24
+          - 192.168.100.0/24
 
     # Native routing
     routingMode: native
