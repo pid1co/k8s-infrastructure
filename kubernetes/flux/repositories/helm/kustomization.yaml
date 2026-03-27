@@ -18,3 +18,4 @@ resources:
   - grafana.yaml
   - bitnami.yaml
   - influxdata.yaml
+  - jameswynn.yaml
