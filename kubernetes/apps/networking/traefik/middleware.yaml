@@ -23,6 +23,30 @@ spec:
       - X-authentik-meta-app
       - X-authentik-meta-version
 ---
+# Authentik proxy outpost middleware (for HTTP-Basic passthrough)
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: authentik-proxy-outpost
+  namespace: traefik
+spec:
+  forwardAuth:
+    address: http://ak-outpost-proxy-outpost.authentik.svc:9000/outpost.goauthentik.io/auth/traefik
+    trustForwardHeader: true
+    authResponseHeaders:
+      - Authorization
+      - X-authentik-username
+      - X-authentik-groups
+      - X-authentik-email
+      - X-authentik-name
+      - X-authentik-uid
+      - X-authentik-jwt
+      - X-authentik-meta-jwks
+      - X-authentik-meta-outpost
+      - X-authentik-meta-provider
+      - X-authentik-meta-app
+      - X-authentik-meta-version
+---
 # Authentik outpost handler route
 # This IngressRoute handles the /outpost.goauthentik.io path for all protected apps
 apiVersion: traefik.io/v1alpha1
