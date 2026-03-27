@@ -10,6 +10,7 @@ spec:
     address: http://authentik-server.authentik.svc.cluster.local/outpost.goauthentik.io/auth/traefik
     trustForwardHeader: true
     authResponseHeaders:
+      - Authorization
       - X-authentik-username
       - X-authentik-groups
       - X-authentik-email
