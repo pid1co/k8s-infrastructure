@@ -19,3 +19,4 @@ resources:
   - bitnami.yaml
   - influxdata.yaml
   - jameswynn.yaml
+  - seerr.yaml
