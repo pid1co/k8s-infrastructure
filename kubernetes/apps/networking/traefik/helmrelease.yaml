@@ -42,14 +42,18 @@ spec:
         exposedPort: 80
         protocol: TCP
         # Redirect HTTP to HTTPS
-        redirectTo:
-          port: websecure
+        http:
+          redirections:
+            entryPoint:
+              to: websecure
+              scheme: https
       websecure:
         port: 443
         exposedPort: 443
         protocol: TCP
-        tls:
-          enabled: true
+        http:
+          tls:
+            enabled: true
 
     # Enable IngressRoute CRD
     ingressRoute:
