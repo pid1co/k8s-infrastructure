@@ -76,3 +76,15 @@ spec:
     cdi:
       enabled: true
       default: true
+
+    # Validator - disable since driver/toolkit installed on host
+    # Arch Linux lacks VERSION_ID label that validator requires
+    validator:
+      driver:
+        env:
+          - name: SKIP_VALIDATION
+            value: "true"
+      toolkit:
+        env:
+          - name: SKIP_VALIDATION
+            value: "true"
