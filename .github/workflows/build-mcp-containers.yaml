@@ -56,7 +56,7 @@ jobs:
             type=raw,value={{date 'YYYYMMDD'}}
 
       - name: Build and push FMP MCP Server
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./fmp-mcp
           push: true
@@ -100,7 +100,7 @@ jobs:
             type=raw,value={{date 'YYYYMMDD'}}
 
       - name: Build and push ForexFactory MCP Server
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./forexfactory-mcp
           push: true
