@@ -97,6 +97,14 @@
       "automerge": true,
       "automergeType": "pr",
       "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "Group ARC updates",
+      "matchPackagePatterns": ["actions-runner-controller", "gha-runner-scale-set"],
+      "groupName": "actions-runner-controller",
+      "automerge": true,
+      "automergeType": "pr",
+      "minimumReleaseAge": "3 days"
     }
   ],
   "customManagers": [
