@@ -12,41 +12,54 @@
   "dependencyDashboardTitle": "Renovate Dashboard",
   "suppressNotifications": ["prEditedNotification", "prIgnoreNotification"],
   "rebaseWhen": "conflicted",
-  "commitMessageTopic": "{{depName}}",
-  "commitMessageExtra": "to {{newVersion}}",
-  "commitMessageSuffix": "",
   "flux": {
-    "fileMatch": ["kubernetes/.+\\.ya?ml$"]
+    "managerFilePatterns": ["/(^|/)kubernetes/.+\\.ya?ml$/"]
   },
   "helm-values": {
-    "fileMatch": ["kubernetes/.+\\.ya?ml$"]
+    "managerFilePatterns": ["/(^|/)kubernetes/.+\\.ya?ml$/"]
   },
   "kubernetes": {
-    "fileMatch": ["kubernetes/.+\\.ya?ml$"]
+    "managerFilePatterns": ["/(^|/)kubernetes/.+\\.ya?ml$/"]
   },
-  "regexManagers": [
-    {
-      "description": "Process HelmRelease chart versions",
-      "fileMatch": ["kubernetes/.+\\.ya?ml$"],
-      "matchStrings": [
-        "chart:\\s*\\n\\s*spec:\\s*\\n\\s*chart:\\s*(?<depName>\\S+)\\s*\\n\\s*version:\\s*(?<currentValue>\\S+)\\s*\\n\\s*sourceRef:\\s*\\n\\s*kind:\\s*HelmRepository\\s*\\n\\s*name:\\s*(?<registryUrl>\\S+)"
-      ],
-      "datasourceTemplate": "helm",
-      "registryUrlTemplate": "{{#if (eq registryUrl 'bjw-s')}}https://bjw-s.github.io/helm-charts{{else if (eq registryUrl 'cilium')}}https://helm.cilium.io{{else if (eq registryUrl 'traefik')}}https://traefik.github.io/charts{{else if (eq registryUrl 'jetstack')}}https://charts.jetstack.io{{else if (eq registryUrl 'external-secrets')}}https://charts.external-secrets.io{{else if (eq registryUrl 'democratic-csi')}}https://democratic-csi.github.io/charts{{else if (eq registryUrl 'tailscale')}}https://pkgs.tailscale.com/helmcharts{{else if (eq registryUrl 'nvidia')}}https://helm.ngc.nvidia.com/nvidia{{else if (eq registryUrl 'fairwinds-stable')}}https://charts.fairwinds.com/stable{{else if (eq registryUrl 'authentik')}}https://charts.goauthentik.io{{else}}{{registryUrl}}{{/if}}"
-    }
-  ],
   "packageRules": [
+    {
+      "matchUpdateTypes": ["major"],
+      "semanticCommitType": "feat",
+      "commitMessagePrefix": "{{semanticCommitType}}({{semanticCommitScope}})!:",
+      "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )"
+    },
+    {
+      "matchUpdateTypes": ["minor"],
+      "semanticCommitType": "feat",
+      "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )"
+    },
+    {
+      "matchUpdateTypes": ["patch"],
+      "semanticCommitType": "fix",
+      "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "semanticCommitScope": "container",
+      "commitMessageTopic": "image {{depName}}"
+    },
+    {
+      "matchDatasources": ["helm"],
+      "semanticCommitScope": "helm",
+      "commitMessageTopic": "chart {{depName}}"
+    },
     {
       "description": "Auto-merge minor and patch updates",
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true,
-      "automergeType": "branch"
+      "automergeType": "branch",
+      "minimumReleaseAge": "3 days"
     },
     {
       "description": "Major updates require manual review",
       "matchUpdateTypes": ["major"],
       "automerge": false,
-      "labels": ["major-update"]
+      "labels": ["type/major"]
     },
     {
       "description": "Cilium always requires manual review",
@@ -56,16 +69,31 @@
       "labels": ["networking", "cilium"]
     },
     {
-      "description": "Group bjw-s app-template updates",
-      "matchPackagePatterns": ["^app-template$"],
-      "groupName": "bjw-s app-template"
+      "matchUpdateTypes": ["minor"],
+      "labels": ["type/minor"]
     },
     {
-      "description": "Security updates",
-      "matchPackagePatterns": [".*"],
       "matchUpdateTypes": ["patch"],
-      "matchCurrentVersion": "/^[0-9]+\\.[0-9]+\\.[0-9]+$/",
-      "labels": ["security"]
+      "labels": ["type/patch"]
+    },
+    {
+      "matchDatasources": ["docker"],
+      "addLabels": ["renovate/container"]
+    },
+    {
+      "matchDatasources": ["helm"],
+      "addLabels": ["renovate/helm"]
+    }
+  ],
+  "customManagers": [
+    {
+      "description": "Process annotated dependencies",
+      "customType": "regex",
+      "managerFilePatterns": ["/(^|/)kubernetes/.+\\.ya?ml$/"],
+      "matchStrings": [
+        "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)( repository=(?<registryUrl>\\S+))?\\n.+(:\\s|=)(&\\S+\\s)?(?<currentValue>\\S+)"
+      ],
+      "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}"
     }
   ]
 }
