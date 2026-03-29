@@ -18,12 +18,12 @@ jobs:
       packages: write
     steps:
       - name: Checkout this repo (for Dockerfile)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: infrastructure
 
       - name: Checkout ClawShell
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: clawshell/clawshell
           path: clawshell
