@@ -23,6 +23,11 @@
   },
   "packageRules": [
     {
+      "description": "Disable dashboard approval for all packages",
+      "matchPackagePatterns": ["*"],
+      "dependencyDashboardApproval": false
+    },
+    {
       "matchUpdateTypes": ["major"],
       "semanticCommitType": "feat",
       "commitMessagePrefix": "{{semanticCommitType}}({{semanticCommitScope}})!:",
