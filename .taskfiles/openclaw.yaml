@@ -70,3 +70,47 @@ tasks:
         kubectl get pods -n openclaw-trading -l app.kubernetes.io/name=openclaw
         kubectl get pods -n openclaw-personal -l app.kubernetes.io/name=openclaw
         kubectl get pods -n openclaw-signals -l app.kubernetes.io/name=openclaw
+
+  skills:exec:trading:
+    desc: Execute a skill script in openclaw-trading skills container
+    vars:
+      SCRIPT: '{{.SCRIPT}}'
+      ARGS: '{{.ARGS | default ""}}'
+    preconditions:
+      - sh: '[ -n "{{.SCRIPT}}" ]'
+        msg: "Usage: task openclaw:skills:exec:trading SCRIPT=<script.py> ARGS='<args>'"
+    cmds:
+      - kubectl exec -n openclaw-trading $(kubectl get pod -n openclaw-trading -l app.kubernetes.io/name=openclaw -o name | head -1) -c skills -- python /home/node/.openclaw/workspace/skills/{{.SCRIPT}} {{.ARGS}}
+
+  skills:exec:signals:
+    desc: Execute a skill script in openclaw-signals skills container
+    vars:
+      SCRIPT: '{{.SCRIPT}}'
+      ARGS: '{{.ARGS | default ""}}'
+    preconditions:
+      - sh: '[ -n "{{.SCRIPT}}" ]'
+        msg: "Usage: task openclaw:skills:exec:signals SCRIPT=<script.py> ARGS='<args>'"
+    cmds:
+      - kubectl exec -n openclaw-signals $(kubectl get pod -n openclaw-signals -l app.kubernetes.io/name=openclaw -o name | head -1) -c skills -- python /home/node/.openclaw/workspace/skills/{{.SCRIPT}} {{.ARGS}}
+
+  skills:shell:trading:
+    desc: Open shell in openclaw-trading skills container
+    cmds:
+      - kubectl exec -n openclaw-trading -it $(kubectl get pod -n openclaw-trading -l app.kubernetes.io/name=openclaw -o name | head -1) -c skills -- /bin/bash
+
+  skills:shell:signals:
+    desc: Open shell in openclaw-signals skills container
+    cmds:
+      - kubectl exec -n openclaw-signals -it $(kubectl get pod -n openclaw-signals -l app.kubernetes.io/name=openclaw -o name | head -1) -c skills -- /bin/bash
+
+  skills:test:
+    desc: Test skills container by running a simple Python command
+    cmds:
+      - |
+        echo "=== Testing trading skills container ==="
+        kubectl exec -n openclaw-trading $(kubectl get pod -n openclaw-trading -l app.kubernetes.io/name=openclaw -o name | head -1) -c skills -- python --version
+        kubectl exec -n openclaw-trading $(kubectl get pod -n openclaw-trading -l app.kubernetes.io/name=openclaw -o name | head -1) -c skills -- ls /home/node/.openclaw/workspace/skills/
+        echo ""
+        echo "=== Testing signals skills container ==="
+        kubectl exec -n openclaw-signals $(kubectl get pod -n openclaw-signals -l app.kubernetes.io/name=openclaw -o name | head -1) -c skills -- python --version
+        kubectl exec -n openclaw-signals $(kubectl get pod -n openclaw-signals -l app.kubernetes.io/name=openclaw -o name | head -1) -c skills -- ls /home/node/.openclaw/workspace/skills/
