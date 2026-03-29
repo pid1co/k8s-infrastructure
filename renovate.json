@@ -5,8 +5,7 @@
     "docker:enableMajor",
     ":disableRateLimiting",
     ":dependencyDashboard",
-    ":semanticCommits",
-    ":automergeBranch"
+    ":semanticCommits"
   ],
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Renovate Dashboard",
@@ -52,7 +51,7 @@
       "description": "Auto-merge minor and patch updates",
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true,
-      "automergeType": "branch",
+      "automergeType": "pr",
       "minimumReleaseAge": "3 days"
     },
     {
