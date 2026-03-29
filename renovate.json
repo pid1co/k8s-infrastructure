@@ -88,6 +88,15 @@
     {
       "matchDatasources": ["helm"],
       "addLabels": ["renovate/helm"]
+    },
+    {
+      "description": "Group all digest updates",
+      "matchUpdateTypes": ["digest"],
+      "matchDatasources": ["docker"],
+      "groupName": "container digests",
+      "automerge": true,
+      "automergeType": "pr",
+      "minimumReleaseAge": "3 days"
     }
   ],
   "customManagers": [
