@@ -80,7 +80,7 @@ tasks:
       - sh: '[ -n "{{.SCRIPT}}" ]'
         msg: "Usage: task openclaw:skills:exec:trading SCRIPT=<script.py> ARGS='<args>'"
     cmds:
-      - kubectl exec -n openclaw-trading $(kubectl get pod -n openclaw-trading -l app.kubernetes.io/name=openclaw -o name | head -1) -c skills -- python /home/node/.openclaw/workspace/skills/{{.SCRIPT}} {{.ARGS}}
+      - kubectl exec -n openclaw-trading $(kubectl get pod -n openclaw-trading -l app.kubernetes.io/name=openclaw -o name | head -1) -c skills -- python /opt/skills/{{.SCRIPT}} {{.ARGS}}
 
   skills:exec:signals:
     desc: Execute a skill script in openclaw-signals skills container
@@ -91,7 +91,7 @@ tasks:
       - sh: '[ -n "{{.SCRIPT}}" ]'
         msg: "Usage: task openclaw:skills:exec:signals SCRIPT=<script.py> ARGS='<args>'"
     cmds:
-      - kubectl exec -n openclaw-signals $(kubectl get pod -n openclaw-signals -l app.kubernetes.io/name=openclaw -o name | head -1) -c skills -- python /home/node/.openclaw/workspace/skills/{{.SCRIPT}} {{.ARGS}}
+      - kubectl exec -n openclaw-signals $(kubectl get pod -n openclaw-signals -l app.kubernetes.io/name=openclaw -o name | head -1) -c skills -- python /opt/skills/{{.SCRIPT}} {{.ARGS}}
 
   skills:shell:trading:
     desc: Open shell in openclaw-trading skills container
@@ -109,8 +109,8 @@ tasks:
       - |
         echo "=== Testing trading skills container ==="
         kubectl exec -n openclaw-trading $(kubectl get pod -n openclaw-trading -l app.kubernetes.io/name=openclaw -o name | head -1) -c skills -- python --version
-        kubectl exec -n openclaw-trading $(kubectl get pod -n openclaw-trading -l app.kubernetes.io/name=openclaw -o name | head -1) -c skills -- ls /home/node/.openclaw/workspace/skills/
+        kubectl exec -n openclaw-trading $(kubectl get pod -n openclaw-trading -l app.kubernetes.io/name=openclaw -o name | head -1) -c skills -- ls /opt/skills/
         echo ""
         echo "=== Testing signals skills container ==="
         kubectl exec -n openclaw-signals $(kubectl get pod -n openclaw-signals -l app.kubernetes.io/name=openclaw -o name | head -1) -c skills -- python --version
-        kubectl exec -n openclaw-signals $(kubectl get pod -n openclaw-signals -l app.kubernetes.io/name=openclaw -o name | head -1) -c skills -- ls /home/node/.openclaw/workspace/skills/
+        kubectl exec -n openclaw-signals $(kubectl get pod -n openclaw-signals -l app.kubernetes.io/name=openclaw -o name | head -1) -c skills -- ls /opt/skills/
