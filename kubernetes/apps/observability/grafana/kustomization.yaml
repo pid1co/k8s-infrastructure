@@ -5,3 +5,4 @@ resources:
   - grafana.yaml
   - ingressroute.yaml
   - datasource-influxdb.yaml
+  - dashboard-signals.yaml
