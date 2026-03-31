@@ -20,22 +20,17 @@ spec:
     spec:
       imagePullSecrets:
         - name: ghcr-credentials
-      initContainers:
-        - name: install-playwright
+      containers:
+        - name: forexfactory-mcp
           image: ghcr.io/pid1co/forexfactory-mcp-server:latest
           command:
             - sh
             - -c
             - |
-              playwright install chromium
-              echo "Playwright browsers installed"
-          volumeMounts:
-            - name: playwright-cache
-              mountPath: /root/.cache/ms-playwright
-      containers:
-        - name: forexfactory-mcp
-          image: ghcr.io/pid1co/forexfactory-mcp-server:latest
-          args: ["--transport", "http", "--host", "0.0.0.0", "--port", "8080"]
+              # Let uv create the venv and install dependencies first
+              uv run playwright install chromium
+              # Now start the server
+              exec uv run forexfactory-mcp --transport http --host 0.0.0.0 --port 8080
           ports:
             - name: http
               containerPort: 8080
@@ -45,9 +40,6 @@ spec:
               memory: 256Mi
             limits:
               memory: 1Gi
-          volumeMounts:
-            - name: playwright-cache
-              mountPath: /root/.cache/ms-playwright
           livenessProbe:
             tcpSocket:
               port: http
@@ -58,9 +50,6 @@ spec:
               port: http
             initialDelaySeconds: 30
             periodSeconds: 10
-      volumes:
-        - name: playwright-cache
-          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
