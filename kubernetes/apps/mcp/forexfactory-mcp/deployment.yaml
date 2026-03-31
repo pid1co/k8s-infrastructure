@@ -30,7 +30,7 @@ spec:
               # Let uv create the venv and install dependencies first
               uv run playwright install chromium
               # Now start the server
-              exec uv run forexfactory-mcp --transport http --host 0.0.0.0 --port 8080
+              exec uv run ffcal-server --transport http --host 0.0.0.0 --port 8080
           ports:
             - name: http
               containerPort: 8080
