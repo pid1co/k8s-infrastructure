@@ -1,0 +1,92 @@
+---
+# GHCR auth for Flux image scanning
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: ghcr-auth
+  namespace: flux-system
+spec:
+  refreshInterval: 24h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: onepassword
+  target:
+    name: ghcr-auth
+    creationPolicy: Owner
+    template:
+      type: kubernetes.io/dockerconfigjson
+      data:
+        .dockerconfigjson: |
+          {
+            "auths": {
+              "ghcr.io": {
+                "username": "{{ .username }}",
+                "password": "{{ .token }}",
+                "auth": "{{ printf "%s:%s" .username .token | b64enc }}"
+              }
+            }
+          }
+  data:
+    - secretKey: username
+      remoteRef:
+        key: GitHub Container Registry
+        property: username
+    - secretKey: token
+      remoteRef:
+        key: GitHub Container Registry
+        property: token
+---
+# ImageRepository - scans GHCR for new tags of the skills image
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: openclaw-skills
+  namespace: flux-system
+spec:
+  image: ghcr.io/pid1co/openclaw-skills
+  interval: 5m
+  secretRef:
+    name: ghcr-auth
+---
+# ImagePolicy - track the latest sha-based tags (created by GitHub Actions)
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: openclaw-skills
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: openclaw-skills
+  filterTags:
+    # Match 7-character git sha tags (e.g., 55d87c6)
+    pattern: '^[a-f0-9]{7}$'
+  policy:
+    alphabetical:
+      order: desc
+---
+# ImageUpdateAutomation - commits image updates to git
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageUpdateAutomation
+metadata:
+  name: openclaw-forex
+  namespace: flux-system
+spec:
+  interval: 10m
+  sourceRef:
+    kind: GitRepository
+    name: k8s-apps
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        email: flux@pid1.co
+        name: Flux
+      messageTemplate: |
+        feat(container): update image {{ range .Changed.Changes }}{{ .OldValue }} -> {{ .NewValue }} {{ end }}
+    push:
+      branch: main
+  update:
+    path: ./kubernetes/apps/openclaw/forex
+    strategy: Setters
