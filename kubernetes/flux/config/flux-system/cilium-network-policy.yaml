@@ -1,0 +1,25 @@
+---
+# CiliumNetworkPolicy to allow kubelet health probes to flux controllers
+# The standard Kubernetes NetworkPolicy with ipBlock CIDR doesn't work correctly
+# with Cilium because kubelet traffic gets classified as 'world' identity.
+# This policy uses Cilium's native entity selectors to properly allow health checks.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-kubelet-health-probes
+  namespace: flux-system
+spec:
+  endpointSelector: {}
+  ingress:
+    - fromEntities:
+        - host
+        - remote-node
+        - world
+      toPorts:
+        - ports:
+            - port: "9440"
+              protocol: TCP
+            - port: "9090"
+              protocol: TCP
+            - port: "8080"
+              protocol: TCP
