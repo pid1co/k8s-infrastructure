@@ -31,6 +31,7 @@ spec:
                   key: fmp-api-key
             - name: PORT
               value: "8080"
+            # Static mode with specific toolsets
             - name: DYNAMIC_TOOL_DISCOVERY
               value: "true"
           ports:
