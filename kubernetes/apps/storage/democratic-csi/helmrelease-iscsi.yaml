@@ -1,0 +1,102 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: democratic-csi-iscsi
+  namespace: democratic-csi
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: democratic-csi
+      version: "0.15.1"
+      sourceRef:
+        kind: HelmRepository
+        name: democratic-csi
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  valuesFrom:
+    - kind: Secret
+      name: truenas-api-key
+      valuesKey: api-key
+      targetPath: driver.config.httpConnection.apiKey
+  values:
+    csiDriver:
+      name: "org.democratic-csi.iscsi"
+
+    storageClasses:
+      - name: truenas-iscsi
+        defaultClass: false
+        reclaimPolicy: Retain
+        volumeBindingMode: Immediate
+        allowVolumeExpansion: true
+        parameters:
+          fsType: ext4
+        secrets:
+          provisioner-secret:
+          controller-publish-secret:
+          node-stage-secret:
+          node-publish-secret:
+          controller-expand-secret:
+
+    volumeSnapshotClasses: []
+
+    controller:
+      enabled: true
+      strategy: node
+      resources:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          memory: 128Mi
+
+    node:
+      enabled: true
+      resources:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          memory: 128Mi
+
+    driver:
+      config:
+        driver: freenas-api-iscsi
+        httpConnection:
+          protocol: http
+          host: "192.168.254.1"
+          port: 80
+          allowInsecure: true
+        zfs:
+          datasetParentName: "tank/homelab-k8s/iscsi-volumes"
+          detachedSnapshotsDatasetParentName: "tank/homelab-k8s/snapshots"
+          datasetEnableQuotas: true
+          datasetEnableReservation: false
+          zvolBlocksize: "16K"
+          zvolCompression: "lz4"
+          zvolDedup: ""
+          zvolEnableReservation: false
+        iscsi:
+          targetPortal: "192.168.254.1:3260"
+          targetPortals: []
+          interface: ""
+          namePrefix: "csi-"
+          nameSuffix: ""
+          targetGroups:
+            - targetGroupPortalGroup: 1
+              targetGroupInitiatorGroup: 1
+              targetGroupAuthType: None
+              targetGroupAuthGroup:
+          extentInsecureTpc: true
+          extentXenCompat: false
+          extentDisablePhysicalBlocksize: true
+          extentBlocksize: 512
+          extentRpm: "SSD"
+          extentAvailThreshold: 0
