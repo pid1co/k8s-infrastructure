@@ -1,7 +1,7 @@
 # Multi-stage build for ClawShell
 # https://github.com/clawshell/clawshell
 
-FROM rust:1.93-slim-bookworm AS builder
+FROM rust:1.95-slim-bookworm AS builder
 
 RUN apt-get update && apt-get install -y \
     pkg-config \
