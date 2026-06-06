@@ -35,7 +35,8 @@ spec:
         tailscale.com/hostname: traefik
         tailscale.com/tags: tag:k8s-operator
         tailscale.com/tailnet-ip: "100.67.64.122"
-      loadBalancerClass: tailscale
+      spec:
+        loadBalancerClass: tailscale
 
     # Entry points
     ports:
