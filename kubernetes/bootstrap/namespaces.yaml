@@ -136,43 +136,6 @@ metadata:
     app.kubernetes.io/component: applications
     app.kubernetes.io/category: productivity
 ---
-# OpenClaw namespaces
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openclaw-system
-  labels:
-    app.kubernetes.io/component: openclaw
-    app.kubernetes.io/part-of: openclaw
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openclaw-trading
-  labels:
-    app.kubernetes.io/component: openclaw
-    app.kubernetes.io/part-of: openclaw
-    openclaw.io/instance: trading
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openclaw-personal
-  labels:
-    app.kubernetes.io/component: openclaw
-    app.kubernetes.io/part-of: openclaw
-    openclaw.io/instance: personal
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openclaw-signals
-  labels:
-    app.kubernetes.io/component: openclaw
-    app.kubernetes.io/part-of: openclaw
-    openclaw.io/instance: signals
----
 # MCP server namespace
 apiVersion: v1
 kind: Namespace
