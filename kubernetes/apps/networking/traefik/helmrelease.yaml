@@ -34,7 +34,7 @@ spec:
         tailscale.com/expose: "true"
         tailscale.com/hostname: traefik
         tailscale.com/tags: tag:k8s-operator
-        tailscale.com/tailnet-ip: "100.67.64.122"
+        tailscale.com/tailnet-ip: "100.93.199.62"
       spec:
         loadBalancerClass: tailscale
 
